@@ -50,6 +50,80 @@ button {
   padding: 36px 24px 48px;
 }
 
+.landing-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 20px 56px;
+}
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 360px);
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.hero-copy-wrap,
+.summary-card,
+.apply-panel,
+.alert-box {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  backdrop-filter: blur(18px);
+}
+
+.hero-inline {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.text-link {
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.summary-card {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+  color: white;
+}
+
+.summary-card span,
+.summary-card p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.summary-card strong {
+  font-size: 32px;
+}
+
+.alert-box {
+  margin-bottom: 24px;
+}
+
+.survey-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+}
+
+.survey-column {
+  display: grid;
+  gap: 16px;
+}
+
+.apply-panel {
+  align-self: start;
+}
+
 .hero,
 .panel,
 .phone-frame,
@@ -588,6 +662,11 @@ textarea {
 
   .panel-notes {
     order: 3;
+  }
+
+  .landing-hero,
+  .survey-grid {
+    grid-template-columns: 1fr;
   }
 }
 
