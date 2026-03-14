@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PTA LINE UI Prototype</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">PTA Volunteer Flow</p>
+          <h1>LINEミニアプリと管理画面のUIプロトタイプ</h1>
+          <p class="hero-copy">
+            回答者向けのLIFF体験と、管理者向けの募集管理体験を1画面で確認できる静的プロトタイプです。
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="mode-chip is-active" data-target="member">回答者UI</button>
+          <button class="mode-chip" data-target="admin">管理者UI</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel panel-nav">
+          <div class="panel-head">
+            <p class="panel-kicker">Navigator</p>
+            <h2>画面一覧</h2>
+          </div>
+
+          <div class="screen-list screen-list-member is-active" data-group="member">
+            <button class="screen-link is-active" data-screen="member-list">
+              <span>募集一覧</span>
+              <small>公開中の募集を確認</small>
+            </button>
+            <button class="screen-link" data-screen="member-detail">
+              <span>募集詳細</span>
+              <small>回答や取り消しを実行</small>
+            </button>
+            <button class="screen-link" data-screen="member-done">
+              <span>回答完了</span>
+              <small>受付完了の案内</small>
+            </button>
+            <button class="screen-link" data-screen="member-mypage">
+              <span>自分の回答一覧</span>
+              <small>確定前/確定済みを確認</small>
+            </button>
+          </div>
+
+          <div class="screen-list screen-list-admin" data-group="admin">
+            <button class="screen-link is-active" data-screen="admin-dashboard">
+              <span>ダッシュボード</span>
+              <small>全体状況を確認</small>
+            </button>
+            <button class="screen-link" data-screen="admin-list">
+              <span>募集一覧</span>
+              <small>募集を一覧管理</small>
+            </button>
+            <button class="screen-link" data-screen="admin-edit">
+              <span>募集作成/編集</span>
+              <small>本文や締切を設定</small>
+            </button>
+            <button class="screen-link" data-screen="admin-answers">
+              <span>回答一覧</span>
+              <small>回答者と確定対象を確認</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel panel-preview">
+          <div class="panel-head">
+            <p class="panel-kicker">Preview</p>
+            <h2>画面イメージ</h2>
+          </div>
+
+          <div class="device-stage is-active" data-group="member">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+
+              <section class="screen is-active" data-screen-id="member-list">
+                <div class="mobile-topbar">
+                  <div>
+                    <p class="top-label">PTA募集</p>
+                    <h3>活動募集一覧</h3>
+                  </div>
+                  <span class="status-pill">LIFF</span>
+                </div>
+                <div class="mobile-highlight">
+                  <p>次回の締切</p>
+                  <strong>3月22日 18:00</strong>
+                  <span>回答済みの方も締切までは編集と取り消しが可能です。</span>
+                </div>
+                <div class="survey-card survey-open">
+                  <div class="survey-meta">
+                    <span>校外委員会</span>
+                    <span>3/25 09:00-11:00</span>
+                  </div>
+                  <h4>交通安全見守りスタッフ</h4>
+                  <p>登校時間帯の横断歩道サポート。短時間参加可。</p>
+                  <div class="capacity-row">
+                    <span>現在 6 / 8 名</span>
+                    <button class="action-mini" data-go="member-detail">回答する</button>
+                  </div>
+                </div>
+                <div class="survey-card survey-fresh">
+                  <div class="survey-meta">
+                    <span>図書委員会</span>
+                    <span>3/29 13:00-15:00</span>
+                  </div>
+                  <h4>図書室整理サポート</h4>
+                  <p>本の仕分けや掲示物の張り替えを行う軽作業です。</p>
+                  <div class="capacity-row">
+                    <span>現在 2 / 5 名</span>
+                    <button class="action-mini" data-go="member-detail-new">回答する</button>
+                  </div>
+                </div>
+                <div class="survey-card survey-filled">
+                  <div class="survey-meta">
+                    <span>運動会</span>
+                    <span>4/03 07:30-12:30</span>
+                  </div>
+                  <h4>会場設営サポート</h4>
+                  <p>定員に達しています。取り消しが出ると再度回答可能になります。</p>
+                  <div class="capacity-row">
+                    <span>現在 12 / 12 名</span>
+                    <button class="action-mini is-disabled">満員</button>
+                  </div>
+                </div>
+                <nav class="bottom-nav">
+                  <a class="is-active" href="#">募集</a>
+                  <a href="#">回答一覧</a>
+                  <a href="#">お知らせ</a>
+                </nav>
+              </section>
+
+              <section class="screen" data-screen-id="member-detail">
+                <div class="mobile-topbar">
+                  <div>
+                    <p class="top-label">募集詳細</p>
+                    <h3>交通安全見守りスタッフ</h3>
+                  </div>
+                  <span class="status-pill">募集中</span>
+                </div>
+                <div class="detail-stack">
+                  <div class="detail-block emphasis">
+                    <span>現在 6 / 8 名</span>
+                    <strong>締切 3月22日 18:00</strong>
+                  </div>
+                  <div class="detail-block">
+                    <p class="detail-title">お仕事内容</p>
+                    <p>校門前の立哨と横断歩道の見守りを担当します。蛍光ベストは当日配布します。</p>
+                  </div>
+                  <div class="detail-grid">
+                    <div class="detail-block">
+                      <p class="detail-title">開催日</p>
+                      <p>2026/03/25</p>
+                    </div>
+                    <div class="detail-block">
+                      <p class="detail-title">時間</p>
+                      <p>09:00 - 11:00</p>
+                    </div>
+                  </div>
+                  <div class="detail-grid">
+                    <div class="detail-block">
+                      <p class="detail-title">スタッフ区分</p>
+                      <p>見守り</p>
+                    </div>
+                    <div class="detail-block">
+                      <p class="detail-title">運営区分</p>
+                      <p>校外活動</p>
+                    </div>
+                  </div>
+                  <label class="field">
+                    <span>連絡メモ</span>
+                    <textarea rows="3">当日は徒歩で参加します。</textarea>
+                  </label>
+                </div>
+                <div class="cta-row">
+                    <button class="ghost-button" data-go="member-done">回答を取り消す</button>
+                    <button class="primary-button" data-go="member-done">回答を更新する</button>
+                </div>
+              </section>
+
+              <section class="screen" data-screen-id="member-detail-new">
+                <div class="mobile-topbar">
+                  <div>
+                    <p class="top-label">募集詳細</p>
+                    <h3>図書室整理サポート</h3>
+                  </div>
+                  <span class="status-pill">未回答</span>
+                </div>
+                <div class="detail-stack">
+                  <div class="detail-block emphasis">
+                    <span>現在 2 / 5 名</span>
+                    <strong>締切 3月26日 17:00</strong>
+                  </div>
+                  <div class="detail-block">
+                    <p class="detail-title">お仕事内容</p>
+                    <p>図書室の本棚整理、貸出返却カードの補充、掲示物の張り替えを行います。</p>
+                  </div>
+                  <div class="detail-grid">
+                    <div class="detail-block">
+                      <p class="detail-title">開催日</p>
+                      <p>2026/03/29</p>
+                    </div>
+                    <div class="detail-block">
+                      <p class="detail-title">時間</p>
+                      <p>13:00 - 15:00</p>
+                    </div>
+                  </div>
+                  <div class="detail-grid">
+                    <div class="detail-block">
+                      <p class="detail-title">スタッフ区分</p>
+                      <p>図書支援</p>
+                    </div>
+                    <div class="detail-block">
+                      <p class="detail-title">運営区分</p>
+                      <p>室内活動</p>
+                    </div>
+                  </div>
+                  <label class="field">
+                    <span>連絡メモ</span>
+                    <textarea rows="3" placeholder="必要があれば入力してください"></textarea>
+                  </label>
+                </div>
+                <div class="cta-row single-action">
+                  <button class="primary-button wide" data-go="member-done">この内容で回答する</button>
+                </div>
+              </section>
+
+              <section class="screen" data-screen-id="member-done">
+                <div class="success-panel">
+                  <div class="success-badge">受付完了</div>
+                  <h3>回答を受け付けました</h3>
+                  <p>
+                    LINEに受付完了メッセージを送信しました。締切までは内容の編集や取り消しができます。
+                  </p>
+                  <div class="done-card">
+                    <span>確定通知について</span>
+                    <strong>締切後に自動送信されます</strong>
+                  </div>
+                  <button class="primary-button wide" data-go="member-list">募集一覧へ戻る</button>
+                </div>
+              </section>
+
+              <section class="screen" data-screen-id="member-mypage">
+                <div class="mobile-topbar">
+                  <div>
+                    <p class="top-label">マイページ</p>
+                    <h3>自分の回答一覧</h3>
+                  </div>
+                  <span class="status-pill">2件</span>
+                </div>
+                <div class="answer-item">
+                  <div>
+                    <h4>交通安全見守りスタッフ</h4>
+                    <p>3/25 09:00-11:00</p>
+                  </div>
+                  <span class="tag pending">確定前</span>
+                </div>
+                <div class="answer-item">
+                  <div>
+                    <h4>読み聞かせ補助</h4>
+                    <p>3/14 08:20-09:00</p>
+                  </div>
+                  <span class="tag confirmed">確定済み</span>
+                </div>
+                <div class="timeline-note">
+                  確定済みの募集には、確定通知本文に記載されたオープンチャット案内がLINEで届きます。
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="device-stage" data-group="admin">
+            <div class="admin-shell">
+              <section class="screen is-active" data-screen-id="admin-dashboard">
+                <div class="admin-topbar">
+                  <div>
+                    <p class="top-label">Dashboard</p>
+                    <h3>本日の募集状況</h3>
+                  </div>
+                  <button class="primary-button small" data-go="admin-edit">新規募集</button>
+                </div>
+                <div class="stat-grid">
+                  <article class="stat-card">
+                    <span>公開中</span>
+                    <strong>6</strong>
+                  </article>
+                  <article class="stat-card accent">
+                    <span>締切本日</span>
+                    <strong>2</strong>
+                  </article>
+                  <article class="stat-card warm">
+                    <span>定員到達</span>
+                    <strong>3</strong>
+                  </article>
+                  <article class="stat-card dark">
+                    <span>通知待ち</span>
+                    <strong>14</strong>
+                  </article>
+                </div>
+                <div class="admin-card">
+                  <div class="section-title-row">
+                    <h4>通知ジョブ</h4>
+                    <span>自動実行</span>
+                  </div>
+                  <p>締切後の確定通知は締切直後から10分後の間で順次送信されます。</p>
+                </div>
+              </section>
+
+              <section class="screen" data-screen-id="admin-list">
+                <div class="admin-topbar">
+                  <div>
+                    <p class="top-label">Surveys</p>
+                    <h3>募集一覧</h3>
+                  </div>
+                  <button class="primary-button small" data-go="admin-edit">コピー新規</button>
+                </div>
+                <div class="table-card">
+                  <div class="table-head">
+                    <span>募集名</span>
+                    <span>状況</span>
+                    <span>人数</span>
+                    <span>締切</span>
+                  </div>
+                  <div class="table-row">
+                    <span>交通安全見守りスタッフ</span>
+                    <span class="tag active">公開中</span>
+                    <span>6 / 8</span>
+                    <span>3/22 18:00</span>
+                  </div>
+                  <div class="table-row">
+                    <span>会場設営サポート</span>
+                    <span class="tag closed">定員到達</span>
+                    <span>12 / 12</span>
+                    <span>3/28 17:00</span>
+                  </div>
+                  <div class="table-row">
+                    <span>読み聞かせ補助</span>
+                    <span class="tag pending">下書き</span>
+                    <span>0 / 4</span>
+                    <span>3/15 18:00</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="screen" data-screen-id="admin-edit">
+                <div class="admin-topbar">
+                  <div>
+                    <p class="top-label">Editor</p>
+                    <h3>募集作成</h3>
+                  </div>
+                  <button class="ghost-button small" data-go="admin-list">下書き保存</button>
+                </div>
+                <div class="form-layout">
+                  <label class="field">
+                    <span>募集タイトル</span>
+                    <input type="text" value="交通安全見守りスタッフ" />
+                  </label>
+                  <div class="double-fields">
+                    <label class="field">
+                      <span>募集人数</span>
+                      <input type="number" value="8" />
+                    </label>
+                    <label class="field">
+                      <span>締切日時</span>
+                      <input type="text" value="2026/03/22 18:00" />
+                    </label>
+                  </div>
+                  <label class="field">
+                    <span>募集内容</span>
+                    <textarea rows="3">登校時間帯の見守りスタッフを募集します。</textarea>
+                  </label>
+                  <label class="field">
+                    <span>確定通知本文</span>
+                    <textarea rows="5">ご参加ありがとうございます。確定しました。
+
+オープンチャットURL:
+https://example.com/openchat
+
+参加パスワード:
+PTA2026</textarea>
+                  </label>
+                </div>
+                <div class="cta-row admin-actions">
+                  <button class="ghost-button" data-go="admin-list">プレビュー</button>
+                  <button class="primary-button" data-go="admin-list">公開する</button>
+                </div>
+              </section>
+
+              <section class="screen" data-screen-id="admin-answers">
+                <div class="admin-topbar">
+                  <div>
+                    <p class="top-label">Answers</p>
+                    <h3>回答一覧</h3>
+                  </div>
+                  <span class="status-pill">先着順</span>
+                </div>
+                <div class="table-card">
+                  <div class="table-head answers">
+                    <span>回答者</span>
+                    <span>回答日時</span>
+                    <span>状態</span>
+                    <span>通知</span>
+                  </div>
+                  <div class="table-row answers">
+                    <span>山田 花子</span>
+                    <span>3/10 09:12</span>
+                    <span class="tag confirmed">確定候補</span>
+                    <span>未送信</span>
+                  </div>
+                  <div class="table-row answers">
+                    <span>佐藤 由美</span>
+                    <span>3/10 09:23</span>
+                    <span class="tag confirmed">確定候補</span>
+                    <span>未送信</span>
+                  </div>
+                  <div class="table-row answers">
+                    <span>田中 恵</span>
+                    <span>3/10 10:01</span>
+                    <span class="tag pending">確定前</span>
+                    <span>受付済み</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel panel-notes">
+          <div class="panel-head">
+            <p class="panel-kicker">Notes</p>
+            <h2>UI方針</h2>
+          </div>
+          <ul class="notes-list">
+            <li>回答者UIはLIFF前提で、片手操作しやすい下部ナビと大きめCTAを採用。</li>
+            <li>管理者UIは一覧性を優先し、締切と人数の把握を最短でできる構成。</li>
+            <li>満員から取り消しで再募集可能になる挙動を、一覧上のボタン状態で表現。</li>
+            <li>確定通知本文は募集作成画面で必須入力にして、運用ミスを減らす。</li>
+          </ul>
+        </aside>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
