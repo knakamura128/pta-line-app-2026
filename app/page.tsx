@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
@@ -10,45 +11,29 @@ type LineProfile = {
   displayName: string;
 };
 
-type SurveyId = "traffic" | "library";
-
 type Survey = {
-  id: SurveyId;
+  id: string;
+  slug: string;
   title: string;
-  group: string;
-  schedule: string;
-  capacity: string;
+  committee: string;
+  startsAt: string;
+  endsAt: string;
+  closeAt: string;
+  capacity: number;
+  currentApplications: number;
   status: string;
   description: string;
 };
 
-const surveys: Survey[] = [
-  {
-    id: "traffic",
-    title: "交通安全見守りスタッフ",
-    group: "校外委員会",
-    schedule: "3/25 09:00-11:00",
-    capacity: "6 / 8 名",
-    status: "募集中",
-    description: "登校時間帯の横断歩道サポート。短時間参加可。"
-  },
-  {
-    id: "library",
-    title: "図書室整理サポート",
-    group: "図書委員会",
-    schedule: "3/29 13:00-15:00",
-    capacity: "2 / 5 名",
-    status: "募集中",
-    description: "本の仕分けや掲示物の張り替えを行う軽作業です。"
-  }
-];
-
 export default function Home() {
+  const router = useRouter();
   const [isLineAuthed, setIsLineAuthed] = useState(false);
   const [lineProfile, setLineProfile] = useState<LineProfile | null>(null);
   const [liffStatus, setLiffStatus] = useState<LiffStatus>("idle");
   const [liffError, setLiffError] = useState<string | null>(null);
-  const [pendingSurveyId, setPendingSurveyId] = useState<SurveyId | null>(null);
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [surveysLoading, setSurveysLoading] = useState(true);
+  const [pendingSurveySlug, setPendingSurveySlug] = useState<string | null>(null);
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
 
   useEffect(() => {
@@ -96,8 +81,65 @@ export default function Home() {
     };
   }, [liffId]);
 
-  async function handleApply(surveyId: SurveyId) {
-    setPendingSurveyId(surveyId);
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadSurveys() {
+      try {
+        const response = await fetch("/api/surveys");
+        if (!response.ok) {
+          throw new Error("募集一覧の取得に失敗しました。");
+        }
+
+        const data = (await response.json()) as Survey[];
+        if (!mounted) return;
+        setSurveys(data);
+      } catch (error) {
+        if (!mounted) return;
+        setLiffError(error instanceof Error ? error.message : "募集一覧の取得に失敗しました。");
+      } finally {
+        if (!mounted) return;
+        setSurveysLoading(false);
+      }
+    }
+
+    void loadSurveys();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const storedSurveySlug = window.localStorage.getItem("pendingSurveySlug");
+    if (!storedSurveySlug) {
+      return;
+    }
+
+    setPendingSurveySlug(storedSurveySlug);
+  }, []);
+
+  useEffect(() => {
+    if (!isLineAuthed || !pendingSurveySlug || !lineProfile) {
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("pendingSurveySlug");
+    }
+    router.push(`/surveys/${pendingSurveySlug}`);
+  }, [isLineAuthed, lineProfile, pendingSurveySlug, router]);
+
+  async function handleApply(surveySlug: string) {
+    setPendingSurveySlug(surveySlug);
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("pendingSurveySlug", surveySlug);
+    }
 
     if (!liffId) {
       setLiffStatus("missing_config");
@@ -115,18 +157,18 @@ export default function Home() {
 
       const profile = await liff.getProfile();
       setIsLineAuthed(true);
-      setLineProfile({
+      const nextProfile = {
         userId: profile.userId,
         displayName: profile.displayName
-      });
+      };
+      setLineProfile(nextProfile);
       setLiffError(null);
     } catch (error) {
       setLiffStatus("error");
       setLiffError(error instanceof Error ? error.message : "LINE認証に失敗しました。");
     }
   }
-
-  const selectedSurvey = surveys.find((survey) => survey.id === pendingSurveyId);
+  const selectedSurvey = surveys.find((survey) => survey.slug === pendingSurveySlug);
 
   return (
     <div className="landing-shell">
@@ -155,19 +197,22 @@ export default function Home() {
 
       <main className="survey-grid">
         <section className="survey-column">
+          {surveysLoading ? <div className="detail-block">募集を読み込み中です。</div> : null}
           {surveys.map((survey) => (
             <article className="survey-card survey-open" key={survey.id}>
               <div className="survey-meta">
-                <span>{survey.group}</span>
-                <span>{survey.schedule}</span>
+                <span>{survey.committee}</span>
+                <span>{formatSchedule(survey.startsAt, survey.endsAt)}</span>
               </div>
               <h2>{survey.title}</h2>
               <p>{survey.description}</p>
               <div className="capacity-row">
-                <span>{survey.capacity}</span>
+                <span>
+                  現在 {survey.currentApplications} / {survey.capacity} 名
+                </span>
                 <span className="tag active">{survey.status}</span>
               </div>
-              <button className="primary-button wide" onClick={() => handleApply(survey.id)} type="button">
+              <button className="primary-button wide" onClick={() => handleApply(survey.slug)} type="button">
                 応募する
               </button>
             </article>
@@ -194,13 +239,24 @@ export default function Home() {
             </div>
             <div className="detail-block">
               <p className="detail-title">次の実装</p>
-              <p>認証後は募集詳細ページまたは応募フォームへ遷移し、回答登録 API に接続します。</p>
+              <p>認証後は募集詳細フォームへ遷移し、そこから応募登録 API へ保存します。</p>
             </div>
           </div>
         </aside>
       </main>
     </div>
   );
+}
+
+function formatSchedule(startsAt: string, endsAt: string) {
+  const start = new Date(startsAt);
+  const end = new Date(endsAt);
+
+  return `${start.getMonth() + 1}/${start.getDate()} ${pad(start.getHours())}:${pad(start.getMinutes())}-${pad(end.getHours())}:${pad(end.getMinutes())}`;
+}
+
+function pad(value: number) {
+  return value.toString().padStart(2, "0");
 }
 
 function renderLiffStatus(status: LiffStatus) {

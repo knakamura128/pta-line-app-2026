@@ -494,6 +494,11 @@ textarea {
   font-weight: 700;
 }
 
+.success-text {
+  color: #166534;
+  font-weight: 700;
+}
+
 .success-badge {
   width: fit-content;
   margin: 0 auto;

@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SurveyStatus {
+  PUBLISHED
+  CLOSED
+}
+
+model Survey {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  committee   String
+  description String
+  startsAt    DateTime
+  endsAt      DateTime
+  closeAt     DateTime
+  capacity    Int
+  status      SurveyStatus  @default(PUBLISHED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  applications Application[]
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  surveyId    String
+  lineUserId  String
+  displayName String
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  survey      Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  @@unique([surveyId, lineUserId])
+}
