@@ -23,12 +23,18 @@ type SurveyDetail = {
   capacity: number;
   currentApplications: number;
   status: string;
+  gradeSummary: Array<{
+    grade: string;
+    count: number;
+  }>;
 };
 
 export default function SurveyDetailPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
   const [survey, setSurvey] = useState<SurveyDetail | null>(null);
+  const [childGrade, setChildGrade] = useState("");
+  const [childClass, setChildClass] = useState("");
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -125,6 +131,11 @@ export default function SurveyDetailPage() {
       return;
     }
 
+    if (!childGrade || !childClass) {
+      setErrorMessage("お子さんの学年と組を入力してください。");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setMessage(null);
@@ -139,6 +150,8 @@ export default function SurveyDetailPage() {
           surveyId: survey.id,
           lineUserId: lineProfile.userId,
           displayName: lineProfile.displayName,
+          childGrade,
+          childClass,
           note
         })
       });
@@ -209,6 +222,14 @@ export default function SurveyDetailPage() {
                   <p className="detail-title">締切日時</p>
                   <p>{formatDateTime(survey.closeAt)}</p>
                 </div>
+                <div className="detail-block">
+                  <p className="detail-title">学年別集計</p>
+                  <p>
+                    {survey.gradeSummary.length > 0
+                      ? survey.gradeSummary.map((row) => `${row.grade}年: ${row.count}人`).join(" / ")
+                      : "まだ応募はありません"}
+                  </p>
+                </div>
               </div>
             </article>
           )}
@@ -224,6 +245,29 @@ export default function SurveyDetailPage() {
               <span>お名前</span>
               <input readOnly type="text" value={lineProfile?.displayName ?? "LINE認証を確認中"} />
             </label>
+            <div className="double-fields">
+              <label className="field">
+                <span>お子さんの学年</span>
+                <select onChange={(event) => setChildGrade(event.target.value)} value={childGrade}>
+                  <option value="">選択してください</option>
+                  <option value="1">1年</option>
+                  <option value="2">2年</option>
+                  <option value="3">3年</option>
+                  <option value="4">4年</option>
+                  <option value="5">5年</option>
+                  <option value="6">6年</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>お子さんの組</span>
+                <input
+                  onChange={(event) => setChildClass(event.target.value)}
+                  placeholder="例: 2組"
+                  type="text"
+                  value={childClass}
+                />
+              </label>
+            </div>
             <label className="field">
               <span>連絡メモ</span>
               <textarea

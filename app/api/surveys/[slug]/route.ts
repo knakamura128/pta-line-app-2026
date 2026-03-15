@@ -25,6 +25,19 @@ export async function GET(
     return NextResponse.json({ message: "募集が見つかりません。" }, { status: 404 });
   }
 
+  const gradeSummary = await prisma.application.groupBy({
+    by: ["childGrade"],
+    where: {
+      surveyId: survey.id
+    },
+    _count: {
+      childGrade: true
+    },
+    orderBy: {
+      childGrade: "asc"
+    }
+  });
+
   return NextResponse.json({
     id: survey.id,
     slug: survey.slug,
@@ -36,6 +49,10 @@ export async function GET(
     closeAt: survey.closeAt,
     capacity: survey.capacity,
     currentApplications: survey._count.applications,
-    status: survey._count.applications >= survey.capacity ? "満員" : "募集中"
+    status: survey._count.applications >= survey.capacity ? "満員" : "募集中",
+    gradeSummary: gradeSummary.map((row) => ({
+      grade: row.childGrade,
+      count: row._count.childGrade
+    }))
   });
 }

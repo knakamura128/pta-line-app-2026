@@ -7,6 +7,8 @@ type ApplyRequest = {
   surveyId?: string;
   lineUserId?: string;
   displayName?: string;
+  childGrade?: string;
+  childClass?: string;
   note?: string;
 };
 
@@ -15,7 +17,7 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as ApplyRequest;
 
-  if (!body.surveyId || !body.lineUserId || !body.displayName) {
+  if (!body.surveyId || !body.lineUserId || !body.displayName || !body.childGrade || !body.childClass) {
     return NextResponse.json({ message: "必須項目が不足しています。" }, { status: 400 });
   }
 
@@ -44,6 +46,8 @@ export async function POST(request: Request) {
         surveyId: survey.id,
         lineUserId: body.lineUserId,
         displayName: body.displayName,
+        childGrade: body.childGrade,
+        childClass: body.childClass,
         note: body.note
       }
     });
