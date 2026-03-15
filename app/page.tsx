@@ -151,8 +151,12 @@ export default function Home() {
       const { default: liff } = await import("@line/liff");
 
       if (!liff.isLoggedIn()) {
-        liff.login({ redirectUri: window.location.href });
-        return;
+        if (!liff.isInClient()) {
+          liff.login({ redirectUri: window.location.href });
+          return;
+        }
+
+        throw new Error("LINEアプリ内で未ログイン状態です。LIFF URL から開き直してください。");
       }
 
       const profile = await liff.getProfile();

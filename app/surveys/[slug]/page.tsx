@@ -57,8 +57,12 @@ export default function SurveyDetailPage() {
         if (!mounted) return;
 
         if (!liff.isLoggedIn()) {
-          liff.login({ redirectUri: window.location.href });
-          return;
+          if (!liff.isInClient()) {
+            liff.login({ redirectUri: window.location.href });
+            return;
+          }
+
+          throw new Error("LINEアプリ内で未ログイン状態です。LIFF URL から開き直してください。");
         }
 
         const profile = await liff.getProfile();
