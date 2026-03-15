@@ -271,10 +271,10 @@ export default function SurveyDetailPage() {
                 <span>お子さんの組</span>
                 <select onChange={(event) => setChildClass(event.target.value)} value={childClass}>
                   <option value="">選択してください</option>
-                  <option value="1">1組</option>
-                  <option value="2">2組</option>
-                  <option value="3">3組</option>
-                  <option value="4">4組</option>
+                  <option value="1組">1組</option>
+                  <option value="2組">2組</option>
+                  <option value="3組">3組</option>
+                  <option value="4組">4組</option>
                 </select>
               </label>
             </div>

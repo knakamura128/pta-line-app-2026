@@ -12,6 +12,10 @@ type ApplyRequest = {
   note?: string;
 };
 
+function normalizeChildClass(childClass: string) {
+  return /^[1-4]$/.test(childClass) ? `${childClass}組` : childClass;
+}
+
 export async function POST(request: Request) {
   await ensureSeedData();
 
@@ -20,6 +24,8 @@ export async function POST(request: Request) {
   if (!body.surveyId || !body.lineUserId || !body.displayName || !body.childGrade || !body.childClass) {
     return NextResponse.json({ message: "必須項目が不足しています。" }, { status: 400 });
   }
+
+  const normalizedChildClass = normalizeChildClass(body.childClass);
 
   const survey = await prisma.survey.findUnique({
     where: { id: body.surveyId },
@@ -72,7 +78,7 @@ export async function POST(request: Request) {
           data: {
             displayName: body.displayName,
             childGrade: body.childGrade,
-            childClass: body.childClass,
+            childClass: normalizedChildClass,
             note: body.note
           }
         })
@@ -82,7 +88,7 @@ export async function POST(request: Request) {
             lineUserId: body.lineUserId,
             displayName: body.displayName,
             childGrade: body.childGrade,
-            childClass: body.childClass,
+            childClass: normalizedChildClass,
             note: body.note
           }
         });
