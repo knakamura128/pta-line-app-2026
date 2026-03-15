@@ -1,21 +1,37 @@
 import Link from "next/link";
+import { ensureSeedData } from "@/lib/bootstrap";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AdminPage() {
+  await ensureSeedData();
+
+  const [surveyCount, applicationCount, openSurveyCount] = await Promise.all([
+    prisma.survey.count(),
+    prisma.application.count(),
+    prisma.survey.count({
+      where: {
+        status: "PUBLISHED"
+      }
+    })
+  ]);
+
   return (
-    <div className="landing-shell">
+    <>
       <header className="landing-hero">
         <div className="hero-copy-wrap">
           <p className="eyebrow">Admin Console</p>
           <h1>管理者ダッシュボード</h1>
           <p className="hero-copy">
-            この画面は Basic 認証で保護されています。今後、募集作成、応募一覧、通知送信をここに集約します。
+            この画面は Basic 認証で保護されています。募集管理、応募一覧、学年別集計の入口をここに集約します。
           </p>
           <div className="hero-inline">
-            <Link className="text-link" href="/">
-              募集一覧へ戻る
+            <Link className="text-link" href="/admin/surveys">
+              募集管理へ
             </Link>
-            <Link className="text-link" href="/prototype">
-              UIモックを見る
+            <Link className="text-link" href="/admin/applications">
+              応募集計へ
             </Link>
           </div>
         </div>
@@ -28,25 +44,45 @@ export default function AdminPage() {
 
       <main className="survey-grid">
         <section className="survey-column">
+          <div className="stat-grid admin-stat-grid">
+            <article className="stat-card">
+              <span>募集数</span>
+              <strong>{surveyCount}</strong>
+            </article>
+            <article className="stat-card accent">
+              <span>公開中</span>
+              <strong>{openSurveyCount}</strong>
+            </article>
+            <article className="stat-card warm">
+              <span>応募数</span>
+              <strong>{applicationCount}</strong>
+            </article>
+          </div>
           <article className="survey-card survey-open">
-            <h2>今後ここに置くもの</h2>
+            <h2>管理機能</h2>
             <div className="detail-stack">
               <div className="detail-block">
                 <p className="detail-title">募集管理</p>
-                <p>新規作成、編集、コピー新規、公開/締切管理</p>
+                <p>募集一覧、公開状況、応募人数、締切を確認できます。</p>
+                <Link className="text-link" href="/admin/surveys">
+                  募集管理ページへ
+                </Link>
               </div>
               <div className="detail-block">
                 <p className="detail-title">応募一覧</p>
-                <p>学年別集計、応募者一覧、確定候補の確認</p>
+                <p>学年別集計、応募者一覧、募集別の応募内訳を確認できます。</p>
+                <Link className="text-link" href="/admin/applications">
+                  応募集計ページへ
+                </Link>
               </div>
               <div className="detail-block">
                 <p className="detail-title">通知</p>
-                <p>確定通知本文の管理、送信履歴の確認</p>
+                <p>次段階で確定通知本文の管理、送信履歴の確認を追加します。</p>
               </div>
             </div>
           </article>
         </section>
       </main>
-    </div>
+    </>
   );
 }
