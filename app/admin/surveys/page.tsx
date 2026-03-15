@@ -23,35 +23,68 @@ export default async function AdminSurveysPage() {
   return (
     <main className="survey-grid">
       <section className="survey-column">
-        <article className="survey-card survey-open">
-          <div className="section-title-row">
-            <h2>募集管理</h2>
-            <span>{surveys.length} 件</span>
+        <div className="admin-topbar">
+          <div>
+            <p className="top-label">Surveys</p>
+            <h3>募集一覧</h3>
           </div>
-          <div className="table-card">
-            <div className="table-head">
-              <span>募集名</span>
-              <span>締切</span>
-              <span>応募数</span>
-              <span>詳細</span>
-            </div>
-            {surveys.map((survey) => (
-              <div className="table-row" key={survey.id}>
-                <span>{survey.title}</span>
-                <span>{formatDateTime(survey.closeAt)}</span>
-                <span>
-                  {survey._count.applications} / {survey.capacity}
-                </span>
+          <div className="hero-inline">
+            <Link className="ghost-button small" href="/admin/surveys/new">
+              新規募集
+            </Link>
+            <Link className="primary-button small" href="/admin/surveys/new?copyFrom=traffic-safety">
+              コピー新規
+            </Link>
+          </div>
+        </div>
+
+        <div className="table-card">
+          <div className="table-head admin-survey-table">
+            <span>募集名</span>
+            <span>状況</span>
+            <span>人数</span>
+            <span>締切</span>
+            <span>操作</span>
+          </div>
+          {surveys.map((survey) => (
+            <div className="table-row admin-survey-table" key={survey.id}>
+              <span>{survey.title}</span>
+              <span className={`tag ${getSurveyTagClass(survey._count.applications, survey.capacity)}`}>
+                {getSurveyStatusLabel(survey._count.applications, survey.capacity)}
+              </span>
+              <span>
+                {survey._count.applications} / {survey.capacity}
+              </span>
+              <span>{formatDateTime(survey.closeAt)}</span>
+              <div className="table-actions">
+                <Link className="text-link" href={`/admin/surveys/${survey.slug}/edit`}>
+                  編集
+                </Link>
+                <Link className="text-link" href={`/admin/surveys/new?copyFrom=${survey.slug}`}>
+                  コピー新規
+                </Link>
                 <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
-                  応募詳細
+                  回答一覧
                 </Link>
               </div>
-            ))}
-          </div>
-        </article>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
+}
+
+function getSurveyStatusLabel(applicationCount: number, capacity: number) {
+  if (applicationCount >= capacity) {
+    return "定員到達";
+  }
+
+  return "公開中";
+}
+
+function getSurveyTagClass(applicationCount: number, capacity: number) {
+  return applicationCount >= capacity ? "closed" : "active";
 }
 
 function formatDateTime(value: Date) {

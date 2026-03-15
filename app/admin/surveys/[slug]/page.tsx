@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
@@ -54,52 +55,71 @@ export default async function AdminSurveyDetailPage({
   return (
     <main className="survey-grid">
       <section className="survey-column">
-        <article className="survey-card survey-open">
-          <div className="section-title-row">
-            <h2>{survey.title}</h2>
-            <span>
-              {survey.applications.length} / {survey.capacity} 名
-            </span>
+        <div className="admin-topbar">
+          <div>
+            <p className="top-label">Answers</p>
+            <h3>回答一覧</h3>
           </div>
-          <div className="detail-stack">
-            <div className="detail-block">
-              <p className="detail-title">募集内容</p>
-              <p>{survey.description}</p>
-            </div>
-            <div className="detail-grid">
-              <div className="detail-block">
-                <p className="detail-title">開催日時</p>
-                <p>{formatSchedule(survey.startsAt, survey.endsAt)}</p>
-              </div>
-              <div className="detail-block">
-                <p className="detail-title">締切</p>
-                <p>{formatDateTime(survey.closeAt)}</p>
-              </div>
-            </div>
+          <div className="hero-inline">
+            <Link className="ghost-button small" href={`/admin/surveys/${survey.slug}/edit`}>
+              募集編集
+            </Link>
+            <Link className="primary-button small" href={`/admin/surveys/new?copyFrom=${survey.slug}`}>
+              コピー新規
+            </Link>
           </div>
-        </article>
+        </div>
 
-        <article className="survey-card survey-open">
-          <h2>応募一覧</h2>
-          <div className="table-card">
-            <div className="table-head answers">
-              <span>応募者</span>
-              <span>学年/組</span>
-              <span>応募日時</span>
-              <span>メモ</span>
+        <div className="admin-card admin-split-card">
+          <div>
+            <div className="section-title-row">
+              <h4>{survey.title}</h4>
+              <span>
+                {survey.applications.length} / {survey.capacity} 名
+              </span>
             </div>
-            {survey.applications.map((application) => (
-              <div className="table-row answers" key={application.id}>
-                <span>{application.displayName}</span>
-                <span>
-                  {application.childGrade}年 {application.childClass}
-                </span>
-                <span>{formatDateTime(application.createdAt)}</span>
-                <span>{application.note || "-"}</span>
-              </div>
-            ))}
+            <p>{survey.description}</p>
           </div>
-        </article>
+          <div className="detail-stack admin-meta-stack">
+            <div className="detail-block">
+              <p className="detail-title">開催日時</p>
+              <p>{formatSchedule(survey.startsAt, survey.endsAt)}</p>
+            </div>
+            <div className="detail-block">
+              <p className="detail-title">締切</p>
+              <p>{formatDateTime(survey.closeAt)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="table-card">
+          <div className="section-title-row">
+            <h4>回答者一覧</h4>
+            <span>通知機能は未実装</span>
+          </div>
+          <div className="table-head answers">
+            <span>回答者</span>
+            <span>回答日時</span>
+            <span>状態</span>
+            <span>メモ</span>
+          </div>
+          {survey.applications.map((application, index) => (
+            <div className="table-row answers" key={application.id}>
+              <span>
+                {application.displayName}
+                <br />
+                <small>
+                  {application.childGrade}年 {application.childClass}
+                </small>
+              </span>
+              <span>{formatDateTime(application.createdAt)}</span>
+              <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
+                {index < survey.capacity ? "確定候補" : "確定前"}
+              </span>
+              <span>{application.note || "-"}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       <aside className="apply-panel">

@@ -20,8 +20,11 @@ export default function AdminLayout({
           <Link className="text-link" href="/admin/surveys">
             募集管理
           </Link>
+          <Link className="text-link" href="/admin/surveys/new">
+            募集作成
+          </Link>
           <Link className="text-link" href="/admin/applications">
-            応募集計
+            回答一覧
           </Link>
           <Link className="text-link" href="/">
             利用者画面

@@ -7,82 +7,115 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   await ensureSeedData();
 
-  const [surveyCount, applicationCount, openSurveyCount] = await Promise.all([
+  const [surveyCount, applicationCount, openSurveyCount, surveys] = await Promise.all([
     prisma.survey.count(),
     prisma.application.count(),
     prisma.survey.count({
       where: {
         status: "PUBLISHED"
       }
+    }),
+    prisma.survey.findMany({
+      orderBy: [{ closeAt: "asc" }, { startsAt: "asc" }],
+      include: {
+        _count: {
+          select: {
+            applications: true
+          }
+        }
+      }
     })
   ]);
 
+  const closingSoonCount = surveys.filter((survey) => survey.status === "PUBLISHED").slice(0, 2).length;
+  const capacityReachedCount = surveys.filter((survey) => survey._count.applications >= survey.capacity).length;
+  const recentSurveys = surveys.slice(0, 4);
+
   return (
-    <>
-      <header className="landing-hero">
-        <div className="hero-copy-wrap">
-          <p className="eyebrow">Admin Console</p>
-          <h1>管理者ダッシュボード</h1>
-          <p className="hero-copy">
-            この画面は Basic 認証で保護されています。募集管理、応募一覧、学年別集計の入口をここに集約します。
-          </p>
+    <main className="survey-grid">
+      <section className="survey-column">
+        <div className="admin-topbar">
+          <div>
+            <p className="top-label">Dashboard</p>
+            <h3>本日の募集状況</h3>
+          </div>
+          <Link className="primary-button small" href="/admin/surveys/new">
+            新規募集
+          </Link>
+        </div>
+
+        <div className="stat-grid">
+          <article className="stat-card">
+            <span>公開中</span>
+            <strong>{openSurveyCount}</strong>
+          </article>
+          <article className="stat-card accent">
+            <span>締切間近</span>
+            <strong>{closingSoonCount}</strong>
+          </article>
+          <article className="stat-card warm">
+            <span>定員到達</span>
+            <strong>{capacityReachedCount}</strong>
+          </article>
+          <article className="stat-card dark">
+            <span>総応募数</span>
+            <strong>{applicationCount}</strong>
+          </article>
+        </div>
+
+        <div className="admin-card admin-split-card">
+          <div>
+            <div className="section-title-row">
+              <h4>募集管理</h4>
+              <span>{surveyCount} 件</span>
+            </div>
+            <p>募集一覧から編集、コピー新規、回答確認へ遷移できます。</p>
+          </div>
           <div className="hero-inline">
             <Link className="text-link" href="/admin/surveys">
-              募集管理へ
+              募集一覧へ
             </Link>
             <Link className="text-link" href="/admin/applications">
-              応募集計へ
+              回答一覧へ
             </Link>
           </div>
         </div>
-        <div className="summary-card">
-          <span>保護範囲</span>
-          <strong>/admin</strong>
-          <p>認証情報は環境変数 `ADMIN_BASIC_USER` と `ADMIN_BASIC_PASS` で管理します。</p>
-        </div>
-      </header>
 
-      <main className="survey-grid">
-        <section className="survey-column">
-          <div className="stat-grid admin-stat-grid">
-            <article className="stat-card">
-              <span>募集数</span>
-              <strong>{surveyCount}</strong>
-            </article>
-            <article className="stat-card accent">
-              <span>公開中</span>
-              <strong>{openSurveyCount}</strong>
-            </article>
-            <article className="stat-card warm">
-              <span>応募数</span>
-              <strong>{applicationCount}</strong>
-            </article>
+        <div className="table-card">
+          <div className="section-title-row">
+            <h4>直近の募集</h4>
+            <Link className="text-link" href="/admin/surveys">
+              すべて見る
+            </Link>
           </div>
-          <article className="survey-card survey-open">
-            <h2>管理機能</h2>
-            <div className="detail-stack">
-              <div className="detail-block">
-                <p className="detail-title">募集管理</p>
-                <p>募集一覧、公開状況、応募人数、締切を確認できます。</p>
-                <Link className="text-link" href="/admin/surveys">
-                  募集管理ページへ
-                </Link>
-              </div>
-              <div className="detail-block">
-                <p className="detail-title">応募一覧</p>
-                <p>学年別集計、応募者一覧、募集別の応募内訳を確認できます。</p>
-                <Link className="text-link" href="/admin/applications">
-                  応募集計ページへ
-                </Link>
-              </div>
-              <div className="detail-block">
-                <p className="detail-title">通知</p>
-                <p>次段階で確定通知本文の管理、送信履歴の確認を追加します。</p>
-              </div>
+          <div className="table-head">
+            <span>募集名</span>
+            <span>状況</span>
+            <span>人数</span>
+            <span>締切</span>
+          </div>
+          {recentSurveys.map((survey) => (
+            <div className="table-row" key={survey.id}>
+              <span>{survey.title}</span>
+              <span className={`tag ${survey._count.applications >= survey.capacity ? "closed" : "active"}`}>
+                {survey._count.applications >= survey.capacity ? "定員到達" : "公開中"}
+              </span>
+              <span>
+                {survey._count.applications} / {survey.capacity}
+              </span>
+              <span>{formatShortDateTime(survey.closeAt)}</span>
             </div>
-          </article>
-        </section>
-      </main>
-    </>
+          ))}
+        </div>
+      </section>
+    </main>
   );
+}
+
+function formatShortDateTime(value: Date) {
+  return `${value.getMonth() + 1}/${pad(value.getDate())} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
+}
+
+function pad(value: number) {
+  return value.toString().padStart(2, "0");
 }
