@@ -3,12 +3,14 @@ import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ slug: string }> }
 ) {
   await ensureSeedData();
 
   const { slug } = await context.params;
+  const { searchParams } = new URL(request.url);
+  const lineUserId = searchParams.get("lineUserId");
 
   const survey = await prisma.survey.findUnique({
     where: { slug },
@@ -38,6 +40,17 @@ export async function GET(
     }
   });
 
+  const existingApplication = lineUserId
+    ? await prisma.application.findUnique({
+        where: {
+          surveyId_lineUserId: {
+            surveyId: survey.id,
+            lineUserId
+          }
+        }
+      })
+    : null;
+
   return NextResponse.json({
     id: survey.id,
     slug: survey.slug,
@@ -50,6 +63,14 @@ export async function GET(
     capacity: survey.capacity,
     currentApplications: survey._count.applications,
     status: survey._count.applications >= survey.capacity ? "満員" : "募集中",
+    existingApplication: existingApplication
+      ? {
+          id: existingApplication.id,
+          childGrade: existingApplication.childGrade,
+          childClass: existingApplication.childClass,
+          note: existingApplication.note
+        }
+      : null,
     gradeSummary: gradeSummary.map((row) => ({
       grade: row.childGrade,
       count: row._count.childGrade

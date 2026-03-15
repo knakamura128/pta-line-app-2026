@@ -23,6 +23,13 @@ type Survey = {
   currentApplications: number;
   status: string;
   description: string;
+  hasApplied?: boolean;
+};
+
+type MyApplication = {
+  survey: {
+    slug: string;
+  };
 };
 
 export default function Home() {
@@ -32,6 +39,7 @@ export default function Home() {
   const [liffStatus, setLiffStatus] = useState<LiffStatus>("idle");
   const [liffError, setLiffError] = useState<string | null>(null);
   const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [myApplicationSlugs, setMyApplicationSlugs] = useState<string[]>([]);
   const [surveysLoading, setSurveysLoading] = useState(true);
   const [pendingSurveySlug, setPendingSurveySlug] = useState<string | null>(null);
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
@@ -111,6 +119,38 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!lineProfile) {
+      return;
+    }
+
+    const lineUserId = lineProfile.userId;
+    let mounted = true;
+
+    async function loadMyApplications() {
+      try {
+        const response = await fetch(`/api/me/applications?lineUserId=${encodeURIComponent(lineUserId)}`);
+        const data = (await response.json()) as MyApplication[] | { message: string };
+
+        if (!response.ok) {
+          throw new Error("message" in data ? data.message : "応募済み情報の取得に失敗しました。");
+        }
+
+        if (!mounted) return;
+        setMyApplicationSlugs((data as MyApplication[]).map((item) => item.survey.slug));
+      } catch (error) {
+        if (!mounted) return;
+        setLiffError(error instanceof Error ? error.message : "応募済み情報の取得に失敗しました。");
+      }
+    }
+
+    void loadMyApplications();
+
+    return () => {
+      mounted = false;
+    };
+  }, [lineProfile]);
+
+  useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -185,6 +225,9 @@ export default function Home() {
           </p>
           <div className="hero-inline">
             <span className="status-pill">{isLineAuthed ? lineProfile?.displayName ?? "認証済み" : "未認証"}</span>
+            <Link className="text-link" href="/me/applications">
+              自分の回答一覧
+            </Link>
             <Link className="text-link" href="/prototype">
               UIモックを見る
             </Link>
@@ -217,7 +260,7 @@ export default function Home() {
                 <span className="tag active">{survey.status}</span>
               </div>
               <button className="primary-button wide" onClick={() => handleApply(survey.slug)} type="button">
-                応募する
+                {myApplicationSlugs.includes(survey.slug) ? "応募済み / 編集する" : "応募する"}
               </button>
             </article>
           ))}

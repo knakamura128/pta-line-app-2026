@@ -89,6 +89,13 @@ button {
   text-decoration: none;
 }
 
+.text-button {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .summary-card {
   display: grid;
   gap: 8px;
@@ -481,6 +488,21 @@ select {
   gap: 18px;
   text-align: center;
   padding: 12px;
+}
+
+.success-screen {
+  min-height: 70vh;
+  display: grid;
+  gap: 18px;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+}
+
+.success-actions {
+  display: grid;
+  gap: 12px;
+  width: min(420px, 100%);
 }
 
 .auth-panel {

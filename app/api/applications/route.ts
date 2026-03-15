@@ -37,22 +37,64 @@ export async function POST(request: Request) {
   }
 
   if (survey._count.applications >= survey.capacity) {
-    return NextResponse.json({ message: "この募集は定員に達しています。" }, { status: 409 });
-  }
-
-  try {
-    const application = await prisma.application.create({
-      data: {
-        surveyId: survey.id,
-        lineUserId: body.lineUserId,
-        displayName: body.displayName,
-        childGrade: body.childGrade,
-        childClass: body.childClass,
-        note: body.note
+    const existing = await prisma.application.findUnique({
+      where: {
+        surveyId_lineUserId: {
+          surveyId: survey.id,
+          lineUserId: body.lineUserId
+        }
       }
     });
 
-    return NextResponse.json({ id: application.id, message: "応募を登録しました。" }, { status: 201 });
+    if (!existing) {
+      return NextResponse.json({ message: "この募集は定員に達しています。" }, { status: 409 });
+    }
+  }
+
+  try {
+    const existing = await prisma.application.findUnique({
+      where: {
+        surveyId_lineUserId: {
+          surveyId: survey.id,
+          lineUserId: body.lineUserId
+        }
+      }
+    });
+
+    const application = existing
+      ? await prisma.application.update({
+          where: {
+            surveyId_lineUserId: {
+              surveyId: survey.id,
+              lineUserId: body.lineUserId
+            }
+          },
+          data: {
+            displayName: body.displayName,
+            childGrade: body.childGrade,
+            childClass: body.childClass,
+            note: body.note
+          }
+        })
+      : await prisma.application.create({
+          data: {
+            surveyId: survey.id,
+            lineUserId: body.lineUserId,
+            displayName: body.displayName,
+            childGrade: body.childGrade,
+            childClass: body.childClass,
+            note: body.note
+          }
+        });
+
+    return NextResponse.json(
+      {
+        id: application.id,
+        action: existing ? "updated" : "created",
+        message: existing ? "応募内容を更新しました。" : "応募を登録しました。"
+      },
+      { status: existing ? 200 : 201 }
+    );
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&

@@ -27,6 +27,12 @@ type SurveyDetail = {
     grade: string;
     count: number;
   }>;
+  existingApplication: {
+    id: string;
+    childGrade: string;
+    childClass: string;
+    note: string | null;
+  } | null;
 };
 
 export default function SurveyDetailPage() {
@@ -98,7 +104,8 @@ export default function SurveyDetailPage() {
     async function loadSurvey() {
       try {
         setLoading(true);
-        const response = await fetch(`/api/surveys/${params.slug}`);
+        const query = lineProfile?.userId ? `?lineUserId=${encodeURIComponent(lineProfile.userId)}` : "";
+        const response = await fetch(`/api/surveys/${params.slug}${query}`);
         const data = (await response.json()) as SurveyDetail | { message: string };
 
         if (!response.ok) {
@@ -106,7 +113,11 @@ export default function SurveyDetailPage() {
         }
 
         if (!mounted) return;
-        setSurvey(data as SurveyDetail);
+        const nextSurvey = data as SurveyDetail;
+        setSurvey(nextSurvey);
+        setChildGrade(nextSurvey.existingApplication?.childGrade ?? "");
+        setChildClass(nextSurvey.existingApplication?.childClass ?? "");
+        setNote(nextSurvey.existingApplication?.note ?? "");
       } catch (error) {
         if (!mounted) return;
         setErrorMessage(error instanceof Error ? error.message : "募集の取得に失敗しました。");
@@ -121,7 +132,7 @@ export default function SurveyDetailPage() {
     return () => {
       mounted = false;
     };
-  }, [params.slug]);
+  }, [params.slug, lineProfile]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -141,8 +152,8 @@ export default function SurveyDetailPage() {
       setMessage(null);
       setErrorMessage(null);
 
-      const response = await fetch("/api/applications", {
-        method: "POST",
+        const response = await fetch("/api/applications", {
+          method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
@@ -156,7 +167,7 @@ export default function SurveyDetailPage() {
         })
       });
 
-      const data = (await response.json()) as { message: string };
+      const data = (await response.json()) as { message: string; action: "created" | "updated" };
 
       if (!response.ok) {
         throw new Error(data.message);
@@ -164,8 +175,8 @@ export default function SurveyDetailPage() {
 
       setMessage(data.message);
       setTimeout(() => {
-        router.push("/");
-      }, 1200);
+        router.push(`/applications/done?mode=${data.action}`);
+      }, 500);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "応募登録に失敗しました。");
     } finally {
@@ -254,18 +265,17 @@ export default function SurveyDetailPage() {
                   <option value="2">2年</option>
                   <option value="3">3年</option>
                   <option value="4">4年</option>
-                  <option value="5">5年</option>
-                  <option value="6">6年</option>
                 </select>
               </label>
               <label className="field">
                 <span>お子さんの組</span>
-                <input
-                  onChange={(event) => setChildClass(event.target.value)}
-                  placeholder="例: 2組"
-                  type="text"
-                  value={childClass}
-                />
+                <select onChange={(event) => setChildClass(event.target.value)} value={childClass}>
+                  <option value="">選択してください</option>
+                  <option value="1">1組</option>
+                  <option value="2">2組</option>
+                  <option value="3">3組</option>
+                  <option value="4">4組</option>
+                </select>
               </label>
             </div>
             <label className="field">
@@ -278,7 +288,7 @@ export default function SurveyDetailPage() {
               />
             </label>
             <button className="primary-button wide" disabled={submitting || !survey || !lineProfile} type="submit">
-              {submitting ? "応募登録中..." : "この内容で応募する"}
+              {submitting ? "保存中..." : survey?.existingApplication ? "応募済み / 編集する" : "この内容で応募する"}
             </button>
           </form>
         </aside>
