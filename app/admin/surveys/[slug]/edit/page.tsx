@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { updateSurveyAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
 
@@ -42,81 +43,78 @@ export default async function AdminSurveyEditPage({
         </div>
 
         <div className="table-card">
-          <div className="form-layout">
-            <label className="field">
-              <span>募集タイトル</span>
-              <input defaultValue={survey.title} type="text" />
-            </label>
-
-            <div className="double-fields">
+          <form action={updateSurveyAction}>
+            <input name="surveyId" type="hidden" value={survey.id} />
+            <div className="form-layout">
               <label className="field">
-                <span>担当区分</span>
-                <select defaultValue={survey.committee}>
-                  <option value="校外委員会">校外委員会</option>
-                  <option value="図書委員会">図書委員会</option>
-                  <option value="本部役員">本部役員</option>
-                  <option value="運営スタッフ">運営スタッフ</option>
-                </select>
+                <span>募集タイトル</span>
+                <input defaultValue={survey.title} name="title" required type="text" />
               </label>
+
+              <div className="double-fields">
+                <label className="field">
+                  <span>担当区分</span>
+                  <select defaultValue={survey.committee} name="committee" required>
+                    <option value="校外委員会">校外委員会</option>
+                    <option value="図書委員会">図書委員会</option>
+                    <option value="本部役員">本部役員</option>
+                    <option value="運営スタッフ">運営スタッフ</option>
+                  </select>
+                </label>
+                <label className="field">
+                  <span>募集人数</span>
+                  <input defaultValue={survey.capacity} min={1} name="capacity" required type="number" />
+                </label>
+              </div>
+
+              <div className="triple-fields">
+                <label className="field">
+                  <span>開催日</span>
+                  <input defaultValue={formatDate(survey.startsAt)} name="eventDate" required type="date" />
+                </label>
+                <label className="field">
+                  <span>開始時刻</span>
+                  <input defaultValue={formatTime(survey.startsAt)} name="startTime" required type="time" />
+                </label>
+                <label className="field">
+                  <span>終了時刻</span>
+                  <input defaultValue={formatTime(survey.endsAt)} name="endTime" required type="time" />
+                </label>
+              </div>
+
               <label className="field">
-                <span>募集人数</span>
-                <input defaultValue={survey.capacity} min={1} type="number" />
+                <span>締切日時</span>
+                <input defaultValue={formatDateTimeLocal(survey.closeAt)} name="closeAt" required type="datetime-local" />
+              </label>
+
+              <label className="field">
+                <span>募集内容</span>
+                <textarea defaultValue={survey.description} name="description" required rows={4} />
+              </label>
+
+              <label className="field">
+                <span>お仕事内容</span>
+                <textarea defaultValue={survey.workDetails} name="workDetails" required rows={4} />
+              </label>
+
+              <label className="field">
+                <span>確定通知本文</span>
+                <textarea defaultValue={survey.confirmationMessage} name="confirmationMessage" required rows={5} />
               </label>
             </div>
 
-            <div className="triple-fields">
-              <label className="field">
-                <span>開催日</span>
-                <input defaultValue={formatDate(survey.startsAt)} type="date" />
-              </label>
-              <label className="field">
-                <span>開始時刻</span>
-                <input defaultValue={formatTime(survey.startsAt)} type="time" />
-              </label>
-              <label className="field">
-                <span>終了時刻</span>
-                <input defaultValue={formatTime(survey.endsAt)} type="time" />
-              </label>
+            <div className="cta-row admin-actions">
+              <button className="ghost-button" name="mode" type="submit" value="draft">
+                下書き保存
+              </button>
+              <Link className="ghost-button" href={`/admin/surveys/${survey.slug}`}>
+                回答一覧
+              </Link>
+              <button className="primary-button" name="mode" type="submit" value="publish">
+                更新する
+              </button>
             </div>
-
-            <label className="field">
-              <span>締切日時</span>
-              <input defaultValue={formatDateTimeLocal(survey.closeAt)} type="datetime-local" />
-            </label>
-
-            <label className="field">
-              <span>募集内容</span>
-              <textarea defaultValue={survey.description} rows={4} />
-            </label>
-
-            <label className="field">
-              <span>お仕事内容</span>
-              <textarea
-                defaultValue={"集合後に役割分担を行い、各担当でサポートをお願いします。終了後は簡単な引き継ぎがあります。"}
-                rows={4}
-              />
-            </label>
-
-            <label className="field">
-              <span>確定通知本文</span>
-              <textarea
-                defaultValue={`ご応募ありがとうございます。担当が確定しました。\n\n当日の詳細は以下をご確認ください。\nhttps://example.com/openchat\nパスワード: PTA2026`}
-                rows={5}
-              />
-            </label>
-          </div>
-
-          <div className="cta-row admin-actions">
-            <Link className="ghost-button" href="/admin/surveys">
-              下書き保存
-            </Link>
-            <Link className="ghost-button" href={`/admin/surveys/${survey.slug}`}>
-              回答一覧
-            </Link>
-            <Link className="primary-button" href="/admin/surveys">
-              更新する
-            </Link>
-          </div>
+          </form>
         </div>
       </section>
     </main>

@@ -4,8 +4,13 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSurveysPage() {
+export default async function AdminSurveysPage({
+  searchParams
+}: {
+  searchParams: Promise<{ saved?: string }>;
+}) {
   await ensureSeedData();
+  const { saved } = await searchParams;
 
   const surveys = await prisma.survey.findMany({
     orderBy: {
@@ -49,8 +54,8 @@ export default async function AdminSurveysPage() {
           {surveys.map((survey) => (
             <div className="table-row admin-survey-table" key={survey.id}>
               <span>{survey.title}</span>
-              <span className={`tag ${getSurveyTagClass(survey._count.applications, survey.capacity)}`}>
-                {getSurveyStatusLabel(survey._count.applications, survey.capacity)}
+              <span className={`tag ${getSurveyTagClass(survey.status, survey._count.applications, survey.capacity)}`}>
+                {getSurveyStatusLabel(survey.status, survey._count.applications, survey.capacity)}
               </span>
               <span>
                 {survey._count.applications} / {survey.capacity}
@@ -71,11 +76,27 @@ export default async function AdminSurveysPage() {
           ))}
         </div>
       </section>
+      {saved ? (
+        <aside className="apply-panel">
+          <div className="inline-notice">
+            <strong>{saved === "published" ? "公開を反映しました。" : "下書きを保存しました。"}</strong>
+            <span>次は一覧から編集、コピー新規、回答一覧の確認ができます。</span>
+          </div>
+        </aside>
+      ) : null}
     </main>
   );
 }
 
-function getSurveyStatusLabel(applicationCount: number, capacity: number) {
+function getSurveyStatusLabel(status: string, applicationCount: number, capacity: number) {
+  if (status === "DRAFT") {
+    return "下書き";
+  }
+
+  if (status === "CLOSED") {
+    return "終了";
+  }
+
   if (applicationCount >= capacity) {
     return "定員到達";
   }
@@ -83,7 +104,15 @@ function getSurveyStatusLabel(applicationCount: number, capacity: number) {
   return "公開中";
 }
 
-function getSurveyTagClass(applicationCount: number, capacity: number) {
+function getSurveyTagClass(status: string, applicationCount: number, capacity: number) {
+  if (status === "DRAFT") {
+    return "pending";
+  }
+
+  if (status === "CLOSED") {
+    return "closed";
+  }
+
   return applicationCount >= capacity ? "closed" : "active";
 }
 

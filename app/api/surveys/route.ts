@@ -6,6 +6,9 @@ export async function GET() {
   await ensureSeedData();
 
   const surveys = await prisma.survey.findMany({
+    where: {
+      status: "PUBLISHED"
+    },
     orderBy: {
       startsAt: "asc"
     },

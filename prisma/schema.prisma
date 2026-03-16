@@ -8,6 +8,7 @@ datasource db {
 }
 
 enum SurveyStatus {
+  DRAFT
   PUBLISHED
   CLOSED
 }
@@ -18,6 +19,8 @@ model Survey {
   title       String
   committee   String
   description String
+  workDetails String        @default("")
+  confirmationMessage String @default("")
   startsAt    DateTime
   endsAt      DateTime
   closeAt     DateTime

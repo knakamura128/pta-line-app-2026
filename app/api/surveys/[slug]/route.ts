@@ -27,6 +27,10 @@ export async function GET(
     return NextResponse.json({ message: "募集が見つかりません。" }, { status: 404 });
   }
 
+  if (survey.status !== "PUBLISHED") {
+    return NextResponse.json({ message: "この募集は公開されていません。" }, { status: 404 });
+  }
+
   const gradeSummary = await prisma.application.groupBy({
     by: ["childGrade"],
     where: {

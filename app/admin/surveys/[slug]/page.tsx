@@ -6,12 +6,15 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminSurveyDetailPage({
-  params
+  params,
+  searchParams
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ saved?: string }>;
 }) {
   await ensureSeedData();
   const { slug } = await params;
+  const { saved } = await searchParams;
 
   const survey = await prisma.survey.findUnique({
     where: { slug },
@@ -89,8 +92,19 @@ export default async function AdminSurveyDetailPage({
               <p className="detail-title">締切</p>
               <p>{formatDateTime(survey.closeAt)}</p>
             </div>
+            <div className="detail-block">
+              <p className="detail-title">お仕事内容</p>
+              <p>{survey.workDetails}</p>
+            </div>
           </div>
         </div>
+
+        {saved ? (
+          <div className="inline-notice">
+            <strong>{saved === "published" ? "公開内容を更新しました。" : "下書きを保存しました。"}</strong>
+            <span>募集内容はこの画面と利用者向け一覧に順次反映されます。</span>
+          </div>
+        ) : null}
 
         <div className="table-card">
           <div className="section-title-row">
