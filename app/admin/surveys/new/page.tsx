@@ -105,20 +105,55 @@ export default async function AdminSurveyNewPage({
                 />
               </label>
 
-              <label className="field">
-                <span>募集内容</span>
-                <textarea
+            <label className="field">
+              <span>募集内容</span>
+              <textarea
                   defaultValue={
                     sourceSurvey?.description ?? "受付、誘導、見守りなど、短時間で参加できるお手伝いを想定しています。"
                   }
                   name="description"
                   required
-                  rows={4}
-                />
-              </label>
+                rows={4}
+              />
+            </label>
 
-              <label className="field">
-                <span>お仕事内容</span>
+            <div className="table-card nested-card">
+              <div className="section-title-row">
+                <h4>追加の選択項目</h4>
+                <span>任意</span>
+              </div>
+              <div className="form-layout">
+                <label className="field">
+                  <span>選択項目タイトル</span>
+                  <input
+                    defaultValue={sourceSurvey?.selectionTitle ?? ""}
+                    name="selectionTitle"
+                    placeholder="例: 参加できる日にち"
+                    type="text"
+                  />
+                </label>
+                <label className="field">
+                  <span>入力形式</span>
+                  <select defaultValue={sourceSurvey?.selectionType ?? "NONE"} name="selectionType">
+                    <option value="NONE">なし</option>
+                    <option value="RADIO">ラジオボタン（単一選択）</option>
+                    <option value="CHECKBOX">チェックボックス（複数選択）</option>
+                  </select>
+                </label>
+                <label className="field">
+                  <span>選択肢</span>
+                  <textarea
+                    defaultValue={Array.isArray(sourceSurvey?.selectionOptions) ? sourceSurvey.selectionOptions.join("\n") : ""}
+                    name="selectionOptions"
+                    placeholder={"1行に1つずつ入力\n4/10(金) 朝\n4/11(土) 午後"}
+                    rows={4}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <label className="field">
+              <span>お仕事内容</span>
                 <textarea
                   defaultValue={
                     sourceSurvey?.workDetails ?? "集合場所に集まり、役割分担の後に担当エリアで作業します。終了後は現地解散です。"

@@ -61,17 +61,22 @@ export async function GET(
     title: survey.title,
     committee: survey.committee,
     description: survey.description,
+    workDetails: survey.workDetails,
     startsAt: survey.startsAt,
     endsAt: survey.endsAt,
     closeAt: survey.closeAt,
     capacity: survey.capacity,
     currentApplications: survey._count.applications,
     status: survey._count.applications >= survey.capacity ? "満員" : "募集中",
+    selectionTitle: survey.selectionTitle,
+    selectionType: survey.selectionType,
+    selectionOptions: survey.selectionOptions ?? [],
     existingApplication: existingApplication
       ? {
           id: existingApplication.id,
           childGrade: existingApplication.childGrade,
           childClass: existingApplication.childClass,
+          selectionAnswers: existingApplication.selectionAnswers ?? [],
           note: existingApplication.note
         }
       : null,

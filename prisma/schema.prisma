@@ -13,6 +13,12 @@ enum SurveyStatus {
   CLOSED
 }
 
+enum SelectionInputType {
+  NONE
+  RADIO
+  CHECKBOX
+}
+
 model Survey {
   id          String        @id @default(cuid())
   slug        String        @unique
@@ -21,6 +27,9 @@ model Survey {
   description String
   workDetails String        @default("")
   confirmationMessage String @default("")
+  selectionTitle String?
+  selectionType SelectionInputType @default(NONE)
+  selectionOptions String[] @default([])
   startsAt    DateTime
   endsAt      DateTime
   closeAt     DateTime
@@ -38,6 +47,7 @@ model Application {
   displayName String
   childGrade  String
   childClass  String
+  selectionAnswers String[] @default([])
   note        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

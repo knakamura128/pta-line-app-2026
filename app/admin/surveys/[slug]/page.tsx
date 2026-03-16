@@ -92,6 +92,12 @@ export default async function AdminSurveyDetailPage({
               <p className="detail-title">締切</p>
               <p>{formatDateTime(survey.closeAt)}</p>
             </div>
+            {survey.selectionType !== "NONE" && survey.selectionTitle ? (
+              <div className="detail-block">
+                <p className="detail-title">{survey.selectionTitle}</p>
+                <p>{Array.isArray(survey.selectionOptions) ? survey.selectionOptions.join(" / ") : "-"}</p>
+              </div>
+            ) : null}
             <div className="detail-block">
               <p className="detail-title">お仕事内容</p>
               <p>{survey.workDetails}</p>
@@ -115,7 +121,7 @@ export default async function AdminSurveyDetailPage({
             <span>回答者</span>
             <span>回答日時</span>
             <span>状態</span>
-            <span>メモ</span>
+            <span>回答内容</span>
           </div>
           {survey.applications.map((application, index) => (
             <div className="table-row answers" key={application.id}>
@@ -130,7 +136,11 @@ export default async function AdminSurveyDetailPage({
               <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
                 {index < survey.capacity ? "確定候補" : "確定前"}
               </span>
-              <span>{application.note || "-"}</span>
+              <span>
+                {Array.isArray(application.selectionAnswers) && application.selectionAnswers.length > 0
+                  ? application.selectionAnswers.join(" / ")
+                  : application.note || "-"}
+              </span>
             </div>
           ))}
         </div>

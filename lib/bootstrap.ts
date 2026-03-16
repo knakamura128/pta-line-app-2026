@@ -1,4 +1,4 @@
-import { SurveyStatus } from "@prisma/client";
+import { SelectionInputType, SurveyStatus } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export async function ensureSeedData() {
@@ -18,6 +18,9 @@ export async function ensureSeedData() {
         workDetails: "集合場所に集まり、役割分担の後に担当エリアで見守りを行います。終了後は現地解散です。",
         confirmationMessage:
           "ご応募ありがとうございます。担当が確定しました。\n\n当日の詳細は以下をご確認ください。\nhttps://example.com/openchat\nパスワード: PTA2026",
+        selectionTitle: "参加できる日にち",
+        selectionType: SelectionInputType.CHECKBOX,
+        selectionOptions: ["4/10(金) 朝", "4/11(土) 朝", "4/11(土) 午後"],
         startsAt: new Date("2026-03-25T09:00:00+09:00"),
         endsAt: new Date("2026-03-25T11:00:00+09:00"),
         closeAt: new Date("2026-03-22T18:00:00+09:00"),
@@ -32,6 +35,9 @@ export async function ensureSeedData() {
         workDetails: "本の仕分け、棚整理、掲示物差し替えを中心に行います。軍手があると便利です。",
         confirmationMessage:
           "ご応募ありがとうございます。担当が確定しました。\n\n当日の詳細は以下をご確認ください。\nhttps://example.com/openchat\nパスワード: PTA2026",
+        selectionTitle: null,
+        selectionType: SelectionInputType.NONE,
+        selectionOptions: [],
         startsAt: new Date("2026-03-29T13:00:00+09:00"),
         endsAt: new Date("2026-03-29T15:00:00+09:00"),
         closeAt: new Date("2026-03-26T17:00:00+09:00"),

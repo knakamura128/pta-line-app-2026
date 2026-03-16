@@ -92,6 +92,41 @@ export default async function AdminSurveyEditPage({
                 <textarea defaultValue={survey.description} name="description" required rows={4} />
               </label>
 
+              <div className="table-card nested-card">
+                <div className="section-title-row">
+                  <h4>追加の選択項目</h4>
+                  <span>任意</span>
+                </div>
+                <div className="form-layout">
+                  <label className="field">
+                    <span>選択項目タイトル</span>
+                    <input
+                      defaultValue={survey.selectionTitle ?? ""}
+                      name="selectionTitle"
+                      placeholder="例: 参加できる日にち"
+                      type="text"
+                    />
+                  </label>
+                  <label className="field">
+                    <span>入力形式</span>
+                    <select defaultValue={survey.selectionType} name="selectionType">
+                      <option value="NONE">なし</option>
+                      <option value="RADIO">ラジオボタン（単一選択）</option>
+                      <option value="CHECKBOX">チェックボックス（複数選択）</option>
+                    </select>
+                  </label>
+                  <label className="field">
+                    <span>選択肢</span>
+                    <textarea
+                      defaultValue={Array.isArray(survey.selectionOptions) ? survey.selectionOptions.join("\n") : ""}
+                      name="selectionOptions"
+                      placeholder={"1行に1つずつ入力\n4/10(金) 朝\n4/11(土) 午後"}
+                      rows={4}
+                    />
+                  </label>
+                </div>
+              </div>
+
               <label className="field">
                 <span>お仕事内容</span>
                 <textarea defaultValue={survey.workDetails} name="workDetails" required rows={4} />

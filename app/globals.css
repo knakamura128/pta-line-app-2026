@@ -495,6 +495,21 @@ h1 {
   font-weight: 800;
 }
 
+.selection-group {
+  display: grid;
+  gap: 10px;
+}
+
+.selection-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+}
+
 input,
 textarea,
 select {
@@ -656,6 +671,11 @@ select {
 .admin-card,
 .table-card {
   padding: 18px;
+}
+
+.nested-card {
+  padding: 16px;
+  background: #fffdfa;
 }
 
 .admin-split-card {

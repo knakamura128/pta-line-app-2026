@@ -17,12 +17,16 @@ type SurveyDetail = {
   title: string;
   committee: string;
   description: string;
+  workDetails: string;
   startsAt: string;
   endsAt: string;
   closeAt: string;
   capacity: number;
   currentApplications: number;
   status: string;
+  selectionTitle: string | null;
+  selectionType: "NONE" | "RADIO" | "CHECKBOX";
+  selectionOptions: string[];
   gradeSummary: Array<{
     grade: string;
     count: number;
@@ -31,6 +35,7 @@ type SurveyDetail = {
     id: string;
     childGrade: string;
     childClass: string;
+    selectionAnswers: string[];
     note: string | null;
   } | null;
 };
@@ -41,6 +46,7 @@ export default function SurveyDetailPage() {
   const [survey, setSurvey] = useState<SurveyDetail | null>(null);
   const [childGrade, setChildGrade] = useState("");
   const [childClass, setChildClass] = useState("");
+  const [selectionAnswers, setSelectionAnswers] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -117,6 +123,7 @@ export default function SurveyDetailPage() {
         setSurvey(nextSurvey);
         setChildGrade(nextSurvey.existingApplication?.childGrade ?? "");
         setChildClass(nextSurvey.existingApplication?.childClass ?? "");
+        setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
         setNote(nextSurvey.existingApplication?.note ?? "");
       } catch (error) {
         if (!mounted) return;
@@ -147,6 +154,11 @@ export default function SurveyDetailPage() {
       return;
     }
 
+    if (survey.selectionType !== "NONE" && selectionAnswers.length === 0) {
+      setErrorMessage("選択項目を入力してください。");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setMessage(null);
@@ -163,6 +175,7 @@ export default function SurveyDetailPage() {
           displayName: lineProfile.displayName,
           childGrade,
           childClass,
+          selectionAnswers,
           note
         })
       });
@@ -182,6 +195,12 @@ export default function SurveyDetailPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function toggleSelectionAnswer(value: string) {
+    setSelectionAnswers((current) =>
+      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
+    );
   }
 
   return (
@@ -232,6 +251,10 @@ export default function SurveyDetailPage() {
                 <div className="detail-block">
                   <p className="detail-title">締切日時</p>
                   <p>{formatDateTime(survey.closeAt)}</p>
+                </div>
+                <div className="detail-block">
+                  <p className="detail-title">お仕事内容</p>
+                  <p>{survey.workDetails}</p>
                 </div>
                 <div className="detail-block">
                   <p className="detail-title">学年別集計</p>
@@ -287,6 +310,32 @@ export default function SurveyDetailPage() {
                 value={note}
               />
             </label>
+            {survey?.selectionType !== "NONE" && survey?.selectionTitle ? (
+              <div className="field">
+                <span>{survey.selectionTitle}</span>
+                <div className="selection-group">
+                  {survey.selectionOptions.map((option) => (
+                    <label className="selection-item" key={option}>
+                      <input
+                        checked={selectionAnswers.includes(option)}
+                        name="selectionAnswer"
+                        onChange={(event) => {
+                          if (survey.selectionType === "RADIO") {
+                            setSelectionAnswers(event.target.checked ? [option] : []);
+                            return;
+                          }
+
+                          toggleSelectionAnswer(option);
+                        }}
+                        type={survey.selectionType === "RADIO" ? "radio" : "checkbox"}
+                        value={option}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <button className="primary-button wide" disabled={submitting || !survey || !lineProfile} type="submit">
               {submitting ? "保存中..." : survey?.existingApplication ? "応募済み / 編集する" : "この内容で応募する"}
             </button>

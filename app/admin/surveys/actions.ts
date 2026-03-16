@@ -1,9 +1,10 @@
 "use server";
 
-import { SurveyStatus } from "@prisma/client";
+import { SelectionInputType, SurveyStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { normalizeSelectionConfig } from "@/lib/survey-selection";
 
 type SaveMode = "draft" | "publish";
 
@@ -19,6 +20,9 @@ export async function createSurveyAction(formData: FormData) {
       description: input.description,
       workDetails: input.workDetails,
       confirmationMessage: input.confirmationMessage,
+      selectionTitle: input.selectionTitle,
+      selectionType: input.selectionType,
+      selectionOptions: input.selectionOptions,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       closeAt: input.closeAt,
@@ -49,6 +53,9 @@ export async function updateSurveyAction(formData: FormData) {
       description: input.description,
       workDetails: input.workDetails,
       confirmationMessage: input.confirmationMessage,
+      selectionTitle: input.selectionTitle,
+      selectionType: input.selectionType,
+      selectionOptions: input.selectionOptions,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       closeAt: input.closeAt,
@@ -74,6 +81,9 @@ function parseSurveyFormData(formData: FormData) {
   const description = readRequiredString(formData, "description");
   const workDetails = readRequiredString(formData, "workDetails");
   const confirmationMessage = readRequiredString(formData, "confirmationMessage");
+  const selectionTitle = readString(formData, "selectionTitle");
+  const selectionType = readSelectionType(formData);
+  const selectionOptions = readString(formData, "selectionOptions");
   const eventDate = readRequiredString(formData, "eventDate");
   const startTime = readRequiredString(formData, "startTime");
   const endTime = readRequiredString(formData, "endTime");
@@ -92,12 +102,17 @@ function parseSurveyFormData(formData: FormData) {
     throw new Error("日時の形式が不正です。");
   }
 
+  const selectionConfig = normalizeSelectionConfig(selectionTitle, selectionType, selectionOptions);
+
   return {
     title,
     committee,
     description,
     workDetails,
     confirmationMessage,
+    selectionTitle: selectionConfig.selectionTitle,
+    selectionType: selectionConfig.selectionType,
+    selectionOptions: selectionConfig.selectionOptions,
     startsAt,
     endsAt,
     closeAt: closeAtDate,
@@ -114,6 +129,19 @@ function readMode(formData: FormData): SaveMode {
   }
 
   return "draft";
+}
+
+function readSelectionType(formData: FormData) {
+  const value = readString(formData, "selectionType");
+
+  switch (value) {
+    case SelectionInputType.RADIO:
+      return SelectionInputType.RADIO;
+    case SelectionInputType.CHECKBOX:
+      return SelectionInputType.CHECKBOX;
+    default:
+      return SelectionInputType.NONE;
+  }
 }
 
 function readRequiredString(formData: FormData, key: string) {

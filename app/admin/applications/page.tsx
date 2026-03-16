@@ -73,7 +73,7 @@ export default async function AdminApplicationsPage() {
             <span>回答者</span>
             <span>回答日時</span>
             <span>状態</span>
-            <span>募集</span>
+            <span>募集 / 選択内容</span>
           </div>
           {applications.map((application, index) => (
             <div className="table-row answers" key={application.id}>
@@ -88,7 +88,15 @@ export default async function AdminApplicationsPage() {
               <span className={`tag ${index < application.survey.capacity ? "confirmed" : "pending"}`}>
                 {index < application.survey.capacity ? "確定候補" : "確定前"}
               </span>
-              <span>{application.survey.title}</span>
+              <span>
+                {application.survey.title}
+                <br />
+                <small>
+                  {Array.isArray(application.selectionAnswers) && application.selectionAnswers.length > 0
+                    ? application.selectionAnswers.join(" / ")
+                    : "-"}
+                </small>
+              </span>
             </div>
           ))}
         </div>

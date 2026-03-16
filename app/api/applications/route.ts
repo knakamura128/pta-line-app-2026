@@ -1,7 +1,9 @@
+import { SelectionInputType } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
+import { normalizeSelectionAnswers } from "@/lib/survey-selection";
 
 type ApplyRequest = {
   surveyId?: string;
@@ -9,6 +11,7 @@ type ApplyRequest = {
   displayName?: string;
   childGrade?: string;
   childClass?: string;
+  selectionAnswers?: string[];
   note?: string;
 };
 
@@ -40,6 +43,19 @@ export async function POST(request: Request) {
 
   if (!survey) {
     return NextResponse.json({ message: "募集が見つかりません。" }, { status: 404 });
+  }
+
+  const surveySelectionOptions = Array.isArray(survey.selectionOptions)
+    ? survey.selectionOptions.filter((value): value is string => typeof value === "string")
+    : [];
+  const normalizedSelectionAnswers = normalizeSelectionAnswers(
+    body.selectionAnswers,
+    survey.selectionType as SelectionInputType,
+    surveySelectionOptions
+  );
+
+  if (survey.selectionType !== SelectionInputType.NONE && normalizedSelectionAnswers.length === 0) {
+    return NextResponse.json({ message: "選択項目を入力してください。" }, { status: 400 });
   }
 
   if (survey._count.applications >= survey.capacity) {
@@ -79,6 +95,7 @@ export async function POST(request: Request) {
             displayName: body.displayName,
             childGrade: body.childGrade,
             childClass: normalizedChildClass,
+            selectionAnswers: normalizedSelectionAnswers,
             note: body.note
           }
         })
@@ -89,6 +106,7 @@ export async function POST(request: Request) {
             displayName: body.displayName,
             childGrade: body.childGrade,
             childClass: normalizedChildClass,
+            selectionAnswers: normalizedSelectionAnswers,
             note: body.note
           }
         });
