@@ -27,9 +27,10 @@ export default async function AdminPage() {
     })
   ]);
 
-  const closingSoonCount = surveys.filter((survey) => survey.status === "PUBLISHED").slice(0, 2).length;
-  const capacityReachedCount = surveys.filter((survey) => survey._count.applications >= survey.capacity).length;
-  const recentSurveys = surveys.slice(0, 4);
+  const publishedSurveys = surveys.filter((survey) => survey.status === "PUBLISHED");
+  const closingSoonCount = publishedSurveys.slice(0, 2).length;
+  const capacityReachedCount = publishedSurveys.filter((survey) => survey._count.applications >= survey.capacity).length;
+  const recentSurveys = publishedSurveys.slice(0, 4);
 
   return (
     <main className="survey-grid">
@@ -83,7 +84,7 @@ export default async function AdminPage() {
 
         <div className="table-card">
           <div className="section-title-row">
-            <h4>直近の募集</h4>
+            <h4>公開中の募集</h4>
             <Link className="text-link" href="/admin/surveys">
               すべて見る
             </Link>
@@ -106,6 +107,7 @@ export default async function AdminPage() {
               <span>{formatShortDateTime(survey.closeAt)}</span>
             </div>
           ))}
+          {recentSurveys.length === 0 ? <div className="table-row"><span>公開中の募集はまだありません。</span><span>-</span><span>-</span><span>-</span></div> : null}
         </div>
       </section>
     </main>
