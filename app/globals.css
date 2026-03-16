@@ -510,6 +510,10 @@ h1 {
   background: white;
 }
 
+.selection-item span {
+  font-weight: 700;
+}
+
 input,
 textarea,
 select {
@@ -519,6 +523,14 @@ select {
   background: white;
   padding: 14px 16px;
   color: var(--ink);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--ink);
 }
 
 .success-panel {
