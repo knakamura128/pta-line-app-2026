@@ -37,9 +37,11 @@ export default async function AdminSurveyEditPage({
             <h3>募集編集</h3>
           </div>
           <div className="hero-inline">
-            <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
-              回答一覧へ
-            </Link>
+            {survey.status !== "DRAFT" ? (
+              <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
+                回答一覧へ
+              </Link>
+            ) : null}
             <Link className="ghost-button small" href="/admin/surveys">
               募集一覧へ
             </Link>
@@ -146,9 +148,15 @@ export default async function AdminSurveyEditPage({
               <button className="ghost-button" name="mode" type="submit" value="draft">
                 下書き保存
               </button>
-              <Link className="ghost-button" href={`/admin/surveys/${survey.slug}`}>
-                回答一覧
-              </Link>
+              {survey.status !== "DRAFT" ? (
+                <Link className="ghost-button" href={`/admin/surveys/${survey.slug}`}>
+                  回答一覧
+                </Link>
+              ) : (
+                <Link className="ghost-button" href="/admin/surveys">
+                  募集一覧
+                </Link>
+              )}
               <button className="primary-button" name="mode" type="submit" value="publish">
                 更新する
               </button>
