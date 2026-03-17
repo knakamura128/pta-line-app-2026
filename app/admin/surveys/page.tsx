@@ -68,9 +68,11 @@ export default async function AdminSurveysPage({
                 <Link className="text-link" href={`/admin/surveys/new?copyFrom=${survey.slug}`}>
                   コピー新規
                 </Link>
-                <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
-                  回答一覧
-                </Link>
+                {survey.status !== "DRAFT" ? (
+                  <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
+                    回答一覧
+                  </Link>
+                ) : null}
               </div>
             </div>
           ))}
