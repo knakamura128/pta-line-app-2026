@@ -189,10 +189,10 @@ function revalidateAdminPaths(slug?: string) {
 
   if (slug) {
     revalidatePath(`/admin/surveys/${slug}`);
-    revalidatePath(`/admin/surveys/${slug}/edit`);
     revalidatePath(`/surveys/${slug}`);
     revalidatePath(`/api/surveys/${slug}`);
   }
 
+  revalidatePath("/admin/surveys/edit");
   revalidatePath("/api/surveys");
 }

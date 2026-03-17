@@ -64,7 +64,7 @@ export default async function AdminSurveyDetailPage({
             <h3>回答一覧</h3>
           </div>
           <div className="hero-inline">
-            <Link className="ghost-button small" href={`/admin/surveys/${survey.slug}/edit`}>
+            <Link className="ghost-button small" href={`/admin/surveys/edit?id=${survey.id}`}>
               募集編集
             </Link>
             <Link className="primary-button small" href={`/admin/surveys/new?copyFrom=${survey.slug}`}>

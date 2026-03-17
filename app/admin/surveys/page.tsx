@@ -62,7 +62,7 @@ export default async function AdminSurveysPage({
               </span>
               <span>{formatDateTime(survey.closeAt)}</span>
               <div className="table-actions">
-                <Link className="text-link" href={`/admin/surveys/${survey.slug}/edit`}>
+                <Link className="text-link" href={`/admin/surveys/edit?id=${survey.id}`}>
                   編集
                 </Link>
                 <Link className="text-link" href={`/admin/surveys/new?copyFrom=${survey.slug}`}>
