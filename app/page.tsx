@@ -212,8 +212,6 @@ export default function Home() {
       setLiffError(error instanceof Error ? error.message : "LINE認証に失敗しました。");
     }
   }
-  const selectedSurvey = surveys.find((survey) => survey.slug === pendingSurveySlug);
-
   return (
     <div className="landing-shell">
       <header className="landing-hero">
@@ -265,31 +263,6 @@ export default function Home() {
             </article>
           ))}
         </section>
-
-        <aside className="apply-panel">
-          <div className="panel-head">
-            <p className="panel-kicker">Apply</p>
-            <h2>応募導線</h2>
-          </div>
-          <div className="detail-stack">
-            <div className="detail-block">
-              <p className="detail-title">LIFF状態</p>
-              <p>{renderLiffStatus(liffStatus)}</p>
-            </div>
-            <div className="detail-block">
-              <p className="detail-title">認証状態</p>
-              <p>{isLineAuthed ? `${lineProfile?.displayName ?? "ユーザー"} としてログイン済み` : "未認証"}</p>
-            </div>
-            <div className="detail-block emphasis">
-              <span>現在の応募対象</span>
-              <strong>{selectedSurvey?.title ?? "まだ選択されていません"}</strong>
-            </div>
-            <div className="detail-block">
-              <p className="detail-title">次の実装</p>
-              <p>認証後は募集詳細フォームへ遷移し、そこから応募登録 API へ保存します。</p>
-            </div>
-          </div>
-        </aside>
       </main>
     </div>
   );
@@ -304,21 +277,4 @@ function formatSchedule(startsAt: string, endsAt: string) {
 
 function pad(value: number) {
   return value.toString().padStart(2, "0");
-}
-
-function renderLiffStatus(status: LiffStatus) {
-  switch (status) {
-    case "idle":
-      return "未初期化";
-    case "loading":
-      return "初期化中";
-    case "ready":
-      return "利用可能";
-    case "error":
-      return "エラー";
-    case "missing_config":
-      return "設定不足";
-    default:
-      return "不明";
-  }
 }
