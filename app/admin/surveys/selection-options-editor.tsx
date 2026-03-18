@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 type SelectionOptionRow = {
+  id: string;
   label: string;
   limit: number;
 };
@@ -10,10 +11,12 @@ type SelectionOptionRow = {
 export function SelectionOptionsEditor({
   initialOptions
 }: {
-  initialOptions: SelectionOptionRow[];
+  initialOptions: Array<Pick<SelectionOptionRow, "label" | "limit">>;
 }) {
-  const [rows, setRows] = useState<SelectionOptionRow[]>(
-    initialOptions.length > 0 ? initialOptions : [{ label: "", limit: 0 }]
+  const [rows, setRows] = useState<SelectionOptionRow[]>(() =>
+    initialOptions.length > 0
+      ? initialOptions.map((row) => ({ ...row, id: crypto.randomUUID() }))
+      : [{ id: crypto.randomUUID(), label: "", limit: 0 }]
   );
 
   function updateRow(index: number, nextRow: SelectionOptionRow) {
@@ -21,13 +24,17 @@ export function SelectionOptionsEditor({
   }
 
   function removeRow(index: number) {
-    setRows((current) => (current.length === 1 ? [{ label: "", limit: 0 }] : current.filter((_, rowIndex) => rowIndex !== index)));
+    setRows((current) =>
+      current.length === 1
+        ? [{ id: crypto.randomUUID(), label: "", limit: 0 }]
+        : current.filter((_, rowIndex) => rowIndex !== index)
+    );
   }
 
   return (
     <div className="form-layout">
       {rows.map((row, index) => (
-        <div className="selection-option-row" key={`${index}-${row.label}`}>
+        <div className="selection-option-row" key={row.id}>
           <label className="field">
             <span>選択肢</span>
             <input
@@ -56,7 +63,7 @@ export function SelectionOptionsEditor({
       ))}
       <button
         className="ghost-button"
-        onClick={() => setRows((current) => [...current, { label: "", limit: 0 }])}
+        onClick={() => setRows((current) => [...current, { id: crypto.randomUUID(), label: "", limit: 0 }])}
         type="button"
       >
         選択肢を追加
