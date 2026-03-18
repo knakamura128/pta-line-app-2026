@@ -306,6 +306,8 @@ export default function SurveyDetailPage() {
                   <option value="2">2年</option>
                   <option value="3">3年</option>
                   <option value="4">4年</option>
+                  <option value="5">5年</option>
+                  <option value="6">6年</option>
                 </select>
               </label>
               <label className="field">
