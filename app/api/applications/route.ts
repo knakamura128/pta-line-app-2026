@@ -9,6 +9,7 @@ import { normalizeSelectionAnswers } from "@/lib/survey-selection";
 type ApplyRequest = {
   surveyId?: string;
   lineUserId?: string;
+  familyName?: string;
   displayName?: string;
   childGrade?: string;
   childClass?: string;
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as ApplyRequest;
 
-  if (!body.surveyId || !body.lineUserId || !body.displayName || !body.childGrade || !body.childClass) {
+  if (!body.surveyId || !body.lineUserId || !body.familyName || !body.displayName || !body.childGrade || !body.childClass) {
     return NextResponse.json({ message: "必須項目が不足しています。" }, { status: 400 });
   }
 
@@ -59,31 +60,45 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "選択項目を入力してください。" }, { status: 400 });
   }
 
-  if (survey._count.applications >= survey.capacity) {
-    const existing = await prisma.application.findUnique({
+  const existing = await prisma.application.findUnique({
+    where: {
+      surveyId_lineUserId: {
+        surveyId: survey.id,
+        lineUserId: body.lineUserId
+      }
+    }
+  });
+
+  for (const selectionAnswer of normalizedSelectionAnswers) {
+    const optionIndex = survey.selectionOptions.findIndex((option) => option === selectionAnswer);
+    const limit = survey.selectionOptionLimits[optionIndex] ?? 0;
+
+    if (limit <= 0) {
+      continue;
+    }
+
+    const currentCount = await prisma.application.count({
       where: {
-        surveyId_lineUserId: {
-          surveyId: survey.id,
-          lineUserId: body.lineUserId
+        surveyId: survey.id,
+        selectionAnswers: {
+          has: selectionAnswer
         }
       }
     });
 
+    const alreadySelected = existing?.selectionAnswers.includes(selectionAnswer) ?? false;
+    if (currentCount >= limit && !alreadySelected) {
+      return NextResponse.json({ message: `「${selectionAnswer}」は上限に達しています。` }, { status: 409 });
+    }
+  }
+
+  if (survey._count.applications >= survey.capacity) {
     if (!existing) {
       return NextResponse.json({ message: "この募集は定員に達しています。" }, { status: 409 });
     }
   }
 
   try {
-    const existing = await prisma.application.findUnique({
-      where: {
-        surveyId_lineUserId: {
-          surveyId: survey.id,
-          lineUserId: body.lineUserId
-        }
-      }
-    });
-
     const application = existing
       ? await prisma.application.update({
           where: {
@@ -93,6 +108,7 @@ export async function POST(request: Request) {
             }
           },
           data: {
+            familyName: body.familyName,
             displayName: body.displayName,
             childGrade: body.childGrade,
             childClass: normalizedChildClass,
@@ -104,6 +120,7 @@ export async function POST(request: Request) {
           data: {
             surveyId: survey.id,
             lineUserId: body.lineUserId,
+            familyName: body.familyName,
             displayName: body.displayName,
             childGrade: body.childGrade,
             childClass: normalizedChildClass,

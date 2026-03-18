@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createSurveyAction } from "@/app/admin/surveys/actions";
+import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
 
@@ -140,15 +141,19 @@ export default async function AdminSurveyNewPage({
                     <option value="CHECKBOX">チェックボックス（複数選択）</option>
                   </select>
                 </label>
-                <label className="field">
-                  <span>選択肢</span>
-                  <textarea
-                    defaultValue={Array.isArray(sourceSurvey?.selectionOptions) ? sourceSurvey.selectionOptions.join("\n") : ""}
-                    name="selectionOptions"
-                    placeholder={"1行に1つずつ入力\n4/10(金) 朝\n4/11(土) 午後"}
-                    rows={4}
+                <div className="field">
+                  <span>選択肢ごとの上限</span>
+                  <SelectionOptionsEditor
+                    initialOptions={
+                      Array.isArray(sourceSurvey?.selectionOptions)
+                        ? sourceSurvey.selectionOptions.map((label, index) => ({
+                            label,
+                            limit: sourceSurvey.selectionOptionLimits[index] ?? 0
+                          }))
+                        : []
+                    }
                   />
-                </label>
+                </div>
               </div>
             </div>
 

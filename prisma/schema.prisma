@@ -40,6 +40,7 @@ model Survey {
   selectionTitle String?
   selectionType SelectionInputType @default(NONE)
   selectionOptions String[] @default([])
+  selectionOptionLimits Int[] @default([])
   startsAt    DateTime
   endsAt      DateTime
   closeAt     DateTime
@@ -55,6 +56,7 @@ model Application {
   id          String   @id @default(cuid())
   surveyId    String
   lineUserId  String
+  familyName  String   @default("")
   displayName String
   childGrade  String
   childClass  String

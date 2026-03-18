@@ -511,7 +511,21 @@ h1 {
 }
 
 .selection-item span {
+  display: grid;
+  gap: 4px;
   font-weight: 700;
+}
+
+.selection-item small {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.selection-option-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(120px, 0.7fr) auto;
+  gap: 12px;
+  align-items: end;
 }
 
 input,
@@ -833,6 +847,10 @@ input[type="checkbox"] {
 
   .admin-split-card,
   .admin-survey-table {
+    grid-template-columns: 1fr;
+  }
+
+  .selection-option-row {
     grid-template-columns: 1fr;
   }
 }

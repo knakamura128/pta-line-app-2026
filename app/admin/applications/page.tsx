@@ -78,7 +78,7 @@ export default async function AdminApplicationsPage() {
           {applications.map((application, index) => (
             <div className="table-row answers" key={application.id}>
               <span>
-                {application.displayName}
+                {application.familyName} / {application.displayName}
                 <br />
                 <small>
                   {application.childGrade}年 {application.childClass}

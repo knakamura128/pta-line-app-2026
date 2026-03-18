@@ -1,39 +1,53 @@
 import { SelectionInputType } from "@prisma/client";
 
-export function parseSelectionOptions(rawValue: string) {
-  return rawValue
-    .split("\n")
-    .map((value) => value.trim())
-    .filter(Boolean);
-}
-
 export function normalizeSelectionConfig(
   title: string,
   type: SelectionInputType,
-  rawOptions: string
+  labels: string[],
+  limits: string[]
 ) {
   if (type === SelectionInputType.NONE) {
     return {
       selectionTitle: null,
       selectionType: SelectionInputType.NONE,
-      selectionOptions: [] as string[]
+      selectionOptions: [] as string[],
+      selectionOptionLimits: [] as number[]
     };
   }
 
-  const options = parseSelectionOptions(rawOptions);
+  const selectionRows = labels
+    .map((label, index) => ({
+      label: label.trim(),
+      limit: (limits[index] ?? "").trim()
+    }))
+    .filter((row) => row.label);
 
   if (!title.trim()) {
     throw new Error("選択項目タイトルを入力してください。");
   }
 
-  if (options.length === 0) {
+  if (selectionRows.length === 0) {
     throw new Error("選択肢を1つ以上入力してください。");
   }
+
+  const selectionOptionLimits = selectionRows.map((row) => {
+    if (!row.limit) {
+      return 0;
+    }
+
+    const parsed = Number(row.limit);
+    if (!Number.isInteger(parsed) || parsed < 0) {
+      throw new Error("選択肢ごとの上限人数は0以上の整数で入力してください。");
+    }
+
+    return parsed;
+  });
 
   return {
     selectionTitle: title.trim(),
     selectionType: type,
-    selectionOptions: options
+    selectionOptions: selectionRows.map((row) => row.label),
+    selectionOptionLimits
   };
 }
 

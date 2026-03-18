@@ -27,12 +27,18 @@ type SurveyDetail = {
   selectionTitle: string | null;
   selectionType: "NONE" | "RADIO" | "CHECKBOX";
   selectionOptions: string[];
+  selectionChoices: Array<{
+    label: string;
+    capacity: number;
+    currentCount: number;
+  }>;
   gradeSummary: Array<{
     grade: string;
     count: number;
   }>;
   existingApplication: {
     id: string;
+    familyName: string;
     childGrade: string;
     childClass: string;
     selectionAnswers: string[];
@@ -44,6 +50,7 @@ export default function SurveyDetailPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
   const [survey, setSurvey] = useState<SurveyDetail | null>(null);
+  const [familyName, setFamilyName] = useState("");
   const [childGrade, setChildGrade] = useState("");
   const [childClass, setChildClass] = useState("");
   const [selectionAnswers, setSelectionAnswers] = useState<string[]>([]);
@@ -121,6 +128,7 @@ export default function SurveyDetailPage() {
         if (!mounted) return;
         const nextSurvey = data as SurveyDetail;
         setSurvey(nextSurvey);
+        setFamilyName(nextSurvey.existingApplication?.familyName ?? "");
         setChildGrade(nextSurvey.existingApplication?.childGrade ?? "");
         setChildClass(nextSurvey.existingApplication?.childClass ?? "");
         setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
@@ -149,8 +157,8 @@ export default function SurveyDetailPage() {
       return;
     }
 
-    if (!childGrade || !childClass) {
-      setErrorMessage("お子さんの学年と組を入力してください。");
+    if (!familyName || !childGrade || !childClass) {
+      setErrorMessage("姓、お子さんの学年、組を入力してください。");
       return;
     }
 
@@ -172,6 +180,7 @@ export default function SurveyDetailPage() {
         body: JSON.stringify({
           surveyId: survey.id,
           lineUserId: lineProfile.userId,
+          familyName,
           displayName: lineProfile.displayName,
           childGrade,
           childClass,
@@ -276,6 +285,15 @@ export default function SurveyDetailPage() {
           </div>
           <form className="form-layout" onSubmit={handleSubmit}>
             <label className="field">
+              <span>お子さんまたは保護者の姓</span>
+              <input
+                onChange={(event) => setFamilyName(event.target.value)}
+                placeholder="例: 山田"
+                type="text"
+                value={familyName}
+              />
+            </label>
+            <label className="field">
               <span>お名前</span>
               <input readOnly type="text" value={lineProfile?.displayName ?? "LINE認証を確認中"} />
             </label>
@@ -314,25 +332,35 @@ export default function SurveyDetailPage() {
               <div className="field">
                 <span>{survey.selectionTitle}</span>
                 <div className="selection-group">
-                  {survey.selectionOptions.map((option) => (
-                    <label className="selection-item" key={option}>
+                  {survey.selectionChoices.map((option) => {
+                    const remaining = option.capacity > 0 ? Math.max(option.capacity - option.currentCount, 0) : null;
+                    const isSelected = selectionAnswers.includes(option.label);
+                    const isFull = option.capacity > 0 && option.currentCount >= option.capacity;
+
+                    return (
+                    <label className="selection-item" key={option.label}>
                       <input
-                        checked={selectionAnswers.includes(option)}
+                        checked={isSelected}
+                        disabled={isFull && !isSelected}
                         name="selectionAnswer"
                         onChange={(event) => {
                           if (survey.selectionType === "RADIO") {
-                            setSelectionAnswers(event.target.checked ? [option] : []);
+                            setSelectionAnswers(event.target.checked ? [option.label] : []);
                             return;
                           }
 
-                          toggleSelectionAnswer(option);
+                          toggleSelectionAnswer(option.label);
                         }}
                         type={survey.selectionType === "RADIO" ? "radio" : "checkbox"}
-                        value={option}
+                        value={option.label}
                       />
-                      <span>{option}</span>
+                      <span>
+                        {option.label}
+                        <small>{isFull && !isSelected ? "満員" : remaining === null ? "上限なし" : `残り ${remaining} 名`}</small>
+                      </span>
                     </label>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : null}

@@ -55,6 +55,21 @@ export async function GET(
       })
     : null;
 
+  const selectionChoices = await Promise.all(
+    survey.selectionOptions.map(async (label, index) => ({
+      label,
+      capacity: survey.selectionOptionLimits[index] ?? 0,
+      currentCount: await prisma.application.count({
+        where: {
+          surveyId: survey.id,
+          selectionAnswers: {
+            has: label
+          }
+        }
+      })
+    }))
+  );
+
   return NextResponse.json({
     id: survey.id,
     slug: survey.slug,
@@ -74,12 +89,14 @@ export async function GET(
     existingApplication: existingApplication
       ? {
           id: existingApplication.id,
+          familyName: existingApplication.familyName,
           childGrade: existingApplication.childGrade,
           childClass: existingApplication.childClass,
           selectionAnswers: existingApplication.selectionAnswers ?? [],
           note: existingApplication.note
         }
       : null,
+    selectionChoices,
     gradeSummary: gradeSummary.map((row) => ({
       grade: row.childGrade,
       count: row._count.childGrade

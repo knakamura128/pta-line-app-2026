@@ -24,6 +24,7 @@ export async function createSurveyAction(formData: FormData) {
       selectionTitle: input.selectionTitle,
       selectionType: input.selectionType,
       selectionOptions: input.selectionOptions,
+      selectionOptionLimits: input.selectionOptionLimits,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       closeAt: input.closeAt,
@@ -57,6 +58,7 @@ export async function updateSurveyAction(formData: FormData) {
       selectionTitle: input.selectionTitle,
       selectionType: input.selectionType,
       selectionOptions: input.selectionOptions,
+      selectionOptionLimits: input.selectionOptionLimits,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       closeAt: input.closeAt,
@@ -139,7 +141,8 @@ function parseSurveyFormData(formData: FormData) {
   const confirmationMessage = readRequiredString(formData, "confirmationMessage");
   const selectionTitle = readString(formData, "selectionTitle");
   const selectionType = readSelectionType(formData);
-  const selectionOptions = readString(formData, "selectionOptions");
+  const selectionOptionLabels = formData.getAll("selectionOptionLabel").map((value) => (typeof value === "string" ? value : ""));
+  const selectionOptionLimits = formData.getAll("selectionOptionLimit").map((value) => (typeof value === "string" ? value : ""));
   const eventDate = readRequiredString(formData, "eventDate");
   const startTime = readRequiredString(formData, "startTime");
   const endTime = readRequiredString(formData, "endTime");
@@ -158,7 +161,12 @@ function parseSurveyFormData(formData: FormData) {
     throw new Error("日時の形式が不正です。");
   }
 
-  const selectionConfig = normalizeSelectionConfig(selectionTitle, selectionType, selectionOptions);
+  const selectionConfig = normalizeSelectionConfig(
+    selectionTitle,
+    selectionType,
+    selectionOptionLabels,
+    selectionOptionLimits
+  );
 
   return {
     title,
@@ -169,6 +177,7 @@ function parseSurveyFormData(formData: FormData) {
     selectionTitle: selectionConfig.selectionTitle,
     selectionType: selectionConfig.selectionType,
     selectionOptions: selectionConfig.selectionOptions,
+    selectionOptionLimits: selectionConfig.selectionOptionLimits,
     startsAt,
     endsAt,
     closeAt: closeAtDate,
