@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { sendConfirmationMessagesAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
 
@@ -10,11 +11,11 @@ export default async function AdminSurveyDetailPage({
   searchParams
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; confirmationSent?: string; confirmationFailed?: string }>;
 }) {
   await ensureSeedData();
   const { slug } = await params;
-  const { saved } = await searchParams;
+  const { saved, confirmationSent, confirmationFailed } = await searchParams;
 
   const survey = await prisma.survey.findUnique({
     where: { slug },
@@ -53,6 +54,14 @@ export default async function AdminSurveyDetailPage({
       childClass: true
     },
     orderBy: [{ childGrade: "asc" }, { childClass: "asc" }]
+  });
+
+  const confirmationLogCount = await prisma.messageDelivery.count({
+    where: {
+      surveyId: survey.id,
+      kind: "CONFIRMATION",
+      status: "SENT"
+    }
   });
 
   return (
@@ -112,10 +121,19 @@ export default async function AdminSurveyDetailPage({
           </div>
         ) : null}
 
+        {confirmationSent || confirmationFailed ? (
+          <div className="inline-notice">
+            <strong>
+              確定通知を送信しました。成功 {confirmationSent ?? "0"} 件 / 失敗 {confirmationFailed ?? "0"} 件
+            </strong>
+            <span>LINE公式アカウントの友だち追加状況やチャネル設定によっては送信できない場合があります。</span>
+          </div>
+        ) : null}
+
         <div className="table-card">
           <div className="section-title-row">
             <h4>回答者一覧</h4>
-            <span>通知機能は未実装</span>
+            <span>先着 {survey.capacity} 名が通知対象</span>
           </div>
           <div className="table-head answers">
             <span>回答者</span>
@@ -168,6 +186,16 @@ export default async function AdminSurveyDetailPage({
                 : "まだ応募はありません"}
             </p>
           </div>
+          <div className="detail-block">
+            <p className="detail-title">確定通知</p>
+            <p>送信成功ログ: {confirmationLogCount} 件</p>
+          </div>
+          <form action={sendConfirmationMessagesAction}>
+            <input name="surveyId" type="hidden" value={survey.id} />
+            <button className="primary-button wide" type="submit">
+              先着 {Math.min(survey.capacity, survey.applications.length)} 名へ確定通知を送る
+            </button>
+          </form>
         </div>
       </aside>
     </main>

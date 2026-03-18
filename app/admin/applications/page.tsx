@@ -38,7 +38,7 @@ export default async function AdminApplicationsPage() {
             <p className="top-label">Answers</p>
             <h3>回答一覧</h3>
           </div>
-          <span className="status-pill">通知機能は未実装</span>
+          <span className="status-pill">受付通知は自動送信 / 確定通知は募集詳細から送信</span>
         </div>
 
         <div className="table-card">

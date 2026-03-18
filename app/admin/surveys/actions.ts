@@ -1,8 +1,9 @@
 "use server";
 
-import { SelectionInputType, SurveyStatus } from "@prisma/client";
+import { MessageDeliveryKind, MessageDeliveryStatus, SelectionInputType, SurveyStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sendLinePushTextMessage } from "@/lib/line-messaging";
 import { prisma } from "@/lib/prisma";
 import { normalizeSelectionConfig } from "@/lib/survey-selection";
 
@@ -72,6 +73,61 @@ export async function updateSurveyAction(formData: FormData) {
 
   revalidateAdminPaths(updatedSurvey.slug);
   redirect(`/admin/surveys/${updatedSurvey.slug}?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+}
+
+export async function sendConfirmationMessagesAction(formData: FormData) {
+  const surveyId = readString(formData, "surveyId");
+
+  if (!surveyId) {
+    throw new Error("募集IDが不足しています。");
+  }
+
+  const survey = await prisma.survey.findUnique({
+    where: {
+      id: surveyId
+    },
+    include: {
+      applications: {
+        orderBy: {
+          createdAt: "asc"
+        }
+      }
+    }
+  });
+
+  if (!survey) {
+    throw new Error("募集が見つかりません。");
+  }
+
+  const recipients = survey.applications.slice(0, survey.capacity);
+  let sentCount = 0;
+  let failedCount = 0;
+
+  for (const application of recipients) {
+    const result = await sendLinePushTextMessage(application.lineUserId, survey.confirmationMessage);
+
+    await prisma.messageDelivery.create({
+      data: {
+        surveyId: survey.id,
+        applicationId: application.id,
+        lineUserId: application.lineUserId,
+        kind: MessageDeliveryKind.CONFIRMATION,
+        status: result.ok ? MessageDeliveryStatus.SENT : MessageDeliveryStatus.FAILED,
+        messageBody: survey.confirmationMessage,
+        errorMessage: result.ok ? null : result.error,
+        sentAt: result.ok ? new Date() : null
+      }
+    });
+
+    if (result.ok) {
+      sentCount += 1;
+    } else {
+      failedCount += 1;
+    }
+  }
+
+  revalidateAdminPaths(survey.slug);
+  redirect(`/admin/surveys/${survey.slug}?confirmationSent=${sentCount}&confirmationFailed=${failedCount}`);
 }
 
 function parseSurveyFormData(formData: FormData) {

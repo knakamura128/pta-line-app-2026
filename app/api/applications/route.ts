@@ -1,7 +1,8 @@
-import { SelectionInputType } from "@prisma/client";
+import { MessageDeliveryKind, MessageDeliveryStatus, SelectionInputType } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { sendLinePushTextMessage } from "@/lib/line-messaging";
 import { prisma } from "@/lib/prisma";
 import { normalizeSelectionAnswers } from "@/lib/survey-selection";
 
@@ -111,11 +112,35 @@ export async function POST(request: Request) {
           }
         });
 
+    const receiptMessage = existing
+      ? `「${survey.title}」の応募内容を更新しました。締切までは再編集できます。`
+      : `「${survey.title}」の応募を受け付けました。締切までは内容の編集ができます。`;
+    const receiptResult = await sendLinePushTextMessage(body.lineUserId, receiptMessage);
+
+    await prisma.messageDelivery.create({
+      data: {
+        surveyId: survey.id,
+        applicationId: application.id,
+        lineUserId: body.lineUserId,
+        kind: MessageDeliveryKind.RECEIPT,
+        status: receiptResult.ok ? MessageDeliveryStatus.SENT : MessageDeliveryStatus.FAILED,
+        messageBody: receiptMessage,
+        errorMessage: receiptResult.ok ? null : receiptResult.error,
+        sentAt: receiptResult.ok ? new Date() : null
+      }
+    });
+
     return NextResponse.json(
       {
         id: application.id,
         action: existing ? "updated" : "created",
-        message: existing ? "応募内容を更新しました。" : "応募を登録しました。"
+        message: receiptResult.ok
+          ? existing
+            ? "応募内容を更新しました。LINEにも受付メッセージを送りました。"
+            : "応募を登録しました。LINEにも受付メッセージを送りました。"
+          : existing
+            ? "応募内容を更新しました。LINE通知は送れませんでした。"
+            : "応募を登録しました。LINE通知は送れませんでした。"
       },
       { status: existing ? 200 : 201 }
     );

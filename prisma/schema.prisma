@@ -19,6 +19,16 @@ enum SelectionInputType {
   CHECKBOX
 }
 
+enum MessageDeliveryKind {
+  RECEIPT
+  CONFIRMATION
+}
+
+enum MessageDeliveryStatus {
+  SENT
+  FAILED
+}
+
 model Survey {
   id          String        @id @default(cuid())
   slug        String        @unique
@@ -38,6 +48,7 @@ model Survey {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   applications Application[]
+  messageDeliveries MessageDelivery[]
 }
 
 model Application {
@@ -52,6 +63,25 @@ model Application {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   survey      Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  messageDeliveries MessageDelivery[]
 
   @@unique([surveyId, lineUserId])
+}
+
+model MessageDelivery {
+  id            String                @id @default(cuid())
+  surveyId      String
+  applicationId String?
+  lineUserId    String
+  kind          MessageDeliveryKind
+  status        MessageDeliveryStatus
+  messageBody   String
+  errorMessage  String?
+  sentAt        DateTime?
+  createdAt     DateTime              @default(now())
+  survey        Survey                @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  application   Application?          @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  @@index([surveyId, kind, status])
+  @@index([applicationId, kind])
 }
