@@ -64,6 +64,24 @@ export default async function AdminSurveyDetailPage({
     }
   });
 
+  const recentMessageDeliveries = await prisma.messageDelivery.findMany({
+    where: {
+      surveyId: survey.id
+    },
+    orderBy: {
+      createdAt: "desc"
+    },
+    take: 10,
+    include: {
+      application: {
+        select: {
+          familyName: true,
+          displayName: true
+        }
+      }
+    }
+  });
+
   return (
     <main className="survey-grid">
       <section className="survey-column">
@@ -159,6 +177,31 @@ export default async function AdminSurveyDetailPage({
                   ? application.selectionAnswers.join(" / ")
                   : application.note || "-"}
               </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="table-card">
+          <div className="section-title-row">
+            <h4>送信ログ</h4>
+            <span>最新 {recentMessageDeliveries.length} 件</span>
+          </div>
+          <div className="table-head message-log-table">
+            <span>送信種別</span>
+            <span>対象者</span>
+            <span>結果</span>
+            <span>送信時刻</span>
+            <span>失敗理由</span>
+          </div>
+          {recentMessageDeliveries.map((delivery) => (
+            <div className="table-row message-log-table" key={delivery.id}>
+              <span>{delivery.kind === "RECEIPT" ? "受付通知" : "確定通知"}</span>
+              <span>{delivery.application ? `${delivery.application.familyName} / ${delivery.application.displayName}` : "-"}</span>
+              <span className={`tag ${delivery.status === "SENT" ? "confirmed" : "closed"}`}>
+                {delivery.status === "SENT" ? "成功" : "失敗"}
+              </span>
+              <span>{formatDateTime(delivery.createdAt)}</span>
+              <span>{delivery.errorMessage || "-"}</span>
             </div>
           ))}
         </div>

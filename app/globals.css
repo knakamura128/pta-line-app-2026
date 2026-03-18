@@ -743,6 +743,10 @@ input[type="checkbox"] {
   grid-template-columns: 1.7fr 0.9fr 0.8fr 1fr 1.4fr;
 }
 
+.message-log-table {
+  grid-template-columns: 0.9fr 1.1fr 1.1fr 0.7fr 2fr;
+}
+
 .table-actions {
   display: flex;
   flex-wrap: wrap;
@@ -846,7 +850,8 @@ input[type="checkbox"] {
   }
 
   .admin-split-card,
-  .admin-survey-table {
+  .admin-survey-table,
+  .message-log-table {
     grid-template-columns: 1fr;
   }
 

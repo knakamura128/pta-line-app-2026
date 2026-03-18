@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminApplicationsPage() {
   await ensureSeedData();
 
-  const [applications, surveys] = await Promise.all([
+  const [applications, surveys, messageDeliveries] = await Promise.all([
     prisma.application.findMany({
       orderBy: {
         createdAt: "desc"
@@ -24,6 +24,25 @@ export default async function AdminApplicationsPage() {
         _count: {
           select: {
             applications: true
+          }
+        }
+      }
+    }),
+    prisma.messageDelivery.findMany({
+      orderBy: {
+        createdAt: "desc"
+      },
+      take: 30,
+      include: {
+        survey: {
+          select: {
+            title: true
+          }
+        },
+        application: {
+          select: {
+            familyName: true,
+            displayName: true
           }
         }
       }
@@ -97,6 +116,31 @@ export default async function AdminApplicationsPage() {
                     : "-"}
                 </small>
               </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="table-card">
+          <div className="section-title-row">
+            <h4>送信ログ</h4>
+            <span>{messageDeliveries.length} 件</span>
+          </div>
+          <div className="table-head message-log-table">
+            <span>送信種別</span>
+            <span>対象者</span>
+            <span>募集</span>
+            <span>結果</span>
+            <span>失敗理由</span>
+          </div>
+          {messageDeliveries.map((delivery) => (
+            <div className="table-row message-log-table" key={delivery.id}>
+              <span>{delivery.kind === "RECEIPT" ? "受付通知" : "確定通知"}</span>
+              <span>{delivery.application ? `${delivery.application.familyName} / ${delivery.application.displayName}` : "-"}</span>
+              <span>{delivery.survey.title}</span>
+              <span className={`tag ${delivery.status === "SENT" ? "confirmed" : "closed"}`}>
+                {delivery.status === "SENT" ? "成功" : "失敗"}
+              </span>
+              <span>{delivery.errorMessage || "-"}</span>
             </div>
           ))}
         </div>
