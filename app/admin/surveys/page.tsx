@@ -55,19 +55,29 @@ export default async function AdminSurveysPage({
           </div>
           {surveys.map((survey) => (
             <div className="table-row admin-survey-table" key={survey.id}>
-              <span>{survey.title}</span>
-              <span className={`tag ${getSurveyTagClass(survey.status, survey._count.applications, survey.capacity)}`}>
-                {getSurveyStatusLabel(survey.status, survey._count.applications, survey.capacity)}
-              </span>
-              <span>
-                {survey._count.applications} / {survey.capacity}
-              </span>
-              <span>{formatDateTimeInTokyo(survey.closeAt)}</span>
-              <SurveyActionButtons
-                isDraft={survey.status === "DRAFT"}
-                surveyId={survey.id}
-                surveySlug={survey.slug}
-              />
+              <div className="mobile-table-cell" data-label="募集名">
+                <span>{survey.title}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="状況">
+                <span className={`tag ${getSurveyTagClass(survey.status, survey._count.applications, survey.capacity)}`}>
+                  {getSurveyStatusLabel(survey.status, survey._count.applications, survey.capacity)}
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="人数">
+                <span>
+                  {survey._count.applications} / {survey.capacity}
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="締切">
+                <span>{formatDateTimeInTokyo(survey.closeAt)}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="操作">
+                <SurveyActionButtons
+                  isDraft={survey.status === "DRAFT"}
+                  surveyId={survey.id}
+                  surveySlug={survey.slug}
+                />
+              </div>
             </div>
           ))}
         </div>

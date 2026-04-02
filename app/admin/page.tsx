@@ -90,25 +90,48 @@ export default async function AdminPage() {
               すべて見る
             </Link>
           </div>
-          <div className="table-head">
+          <div className="table-head recent-survey-table">
             <span>募集名</span>
             <span>状況</span>
             <span>人数</span>
             <span>締切</span>
           </div>
           {recentSurveys.map((survey) => (
-            <div className="table-row" key={survey.id}>
-              <span>{survey.title}</span>
-              <span className={`tag ${survey._count.applications >= survey.capacity ? "closed" : "active"}`}>
-                {survey._count.applications >= survey.capacity ? "定員到達" : "公開中"}
-              </span>
-              <span>
-                {survey._count.applications} / {survey.capacity}
-              </span>
-              <span>{formatShortDateTimeInTokyo(survey.closeAt)}</span>
+            <div className="table-row recent-survey-table" key={survey.id}>
+              <div className="mobile-table-cell" data-label="募集名">
+                <span>{survey.title}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="状況">
+                <span className={`tag ${survey._count.applications >= survey.capacity ? "closed" : "active"}`}>
+                  {survey._count.applications >= survey.capacity ? "定員到達" : "公開中"}
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="人数">
+                <span>
+                  {survey._count.applications} / {survey.capacity}
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="締切">
+                <span>{formatShortDateTimeInTokyo(survey.closeAt)}</span>
+              </div>
             </div>
           ))}
-          {recentSurveys.length === 0 ? <div className="table-row"><span>公開中の募集はまだありません。</span><span>-</span><span>-</span><span>-</span></div> : null}
+          {recentSurveys.length === 0 ? (
+            <div className="table-row recent-survey-table">
+              <div className="mobile-table-cell" data-label="募集名">
+                <span>公開中の募集はまだありません。</span>
+              </div>
+              <div className="mobile-table-cell" data-label="状況">
+                <span>-</span>
+              </div>
+              <div className="mobile-table-cell" data-label="人数">
+                <span>-</span>
+              </div>
+              <div className="mobile-table-cell" data-label="締切">
+                <span>-</span>
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
     </main>

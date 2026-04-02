@@ -785,6 +785,10 @@ input[type="checkbox"] {
   color: var(--muted);
 }
 
+.mobile-table-cell {
+  display: contents;
+}
+
 .form-layout {
   display: grid;
   gap: 14px;
@@ -881,6 +885,36 @@ input[type="checkbox"] {
   .admin-survey-table,
   .message-log-table {
     grid-template-columns: 1fr;
+  }
+
+  .table-head.recent-survey-table,
+  .table-head.admin-survey-table {
+    display: none;
+  }
+
+  .table-row.recent-survey-table,
+  .table-row.admin-survey-table {
+    gap: 14px;
+    padding: 18px 0;
+  }
+
+  .mobile-table-cell {
+    display: grid;
+    gap: 6px;
+    justify-items: start;
+  }
+
+  .mobile-table-cell::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .mobile-table-cell .tag {
+    width: fit-content;
+    min-width: 108px;
   }
 
   .selection-option-row {
