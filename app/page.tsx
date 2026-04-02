@@ -224,9 +224,6 @@ export default function Home() {
             <Link className="text-link" href="/me/applications">
               自分の回答一覧
             </Link>
-            <Link className="text-link" href="/prototype">
-              UIモックを見る
-            </Link>
           </div>
         </div>
         <div className="summary-card">
