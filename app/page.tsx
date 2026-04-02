@@ -227,8 +227,9 @@ export default function Home() {
           </div>
         </div>
         <div className="summary-card">
-          <span>次回締切</span>
-          <strong>3月22日 18:00</strong>
+          <span>公開中の募集</span>
+          <strong>{surveysLoading ? "..." : `${surveys.length}件`}</strong>
+          <p>{surveysLoading ? "募集一覧を確認中です。" : "現在応募できる活動募集の件数です。"}</p>
         </div>
       </header>
 

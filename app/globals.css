@@ -882,4 +882,10 @@ input[type="checkbox"] {
   .selection-option-row {
     grid-template-columns: 1fr;
   }
+
+  .capacity-row {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
 }
