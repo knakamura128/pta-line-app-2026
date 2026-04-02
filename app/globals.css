@@ -502,6 +502,13 @@ h1 {
   font-weight: 800;
 }
 
+.helper-text {
+  margin: -4px 0 2px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .selection-group {
   display: grid;
   gap: 10px;

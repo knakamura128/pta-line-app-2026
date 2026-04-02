@@ -170,9 +170,8 @@ function parseSurveyFormData(formData: FormData) {
   const selectionType = readSelectionType(formData);
   const selectionOptionLabels = formData.getAll("selectionOptionLabel").map((value) => (typeof value === "string" ? value : ""));
   const selectionOptionLimits = formData.getAll("selectionOptionLimit").map((value) => (typeof value === "string" ? value : ""));
-  const eventDate = readRequiredString(formData, "eventDate");
-  const startTime = readRequiredString(formData, "startTime");
-  const endTime = readRequiredString(formData, "endTime");
+  const startsAtValue = readRequiredString(formData, "startsAt");
+  const endsAtValue = readRequiredString(formData, "endsAt");
   const closeAt = readRequiredString(formData, "closeAt");
   const capacityValue = Number(readRequiredString(formData, "capacity"));
 
@@ -180,12 +179,16 @@ function parseSurveyFormData(formData: FormData) {
     throw new Error("募集人数は1以上の整数で入力してください。");
   }
 
-  const startsAt = new Date(`${eventDate}T${startTime}:00+09:00`);
-  const endsAt = new Date(`${eventDate}T${endTime}:00+09:00`);
+  const startsAt = new Date(`${startsAtValue}:00+09:00`);
+  const endsAt = new Date(`${endsAtValue}:00+09:00`);
   const closeAtDate = new Date(`${closeAt}:00+09:00`);
 
   if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()) || Number.isNaN(closeAtDate.getTime())) {
     throw new Error("日時の形式が不正です。");
+  }
+
+  if (startsAt >= endsAt) {
+    throw new Error("終了日時は開始日時より後にしてください。");
   }
 
   const selectionConfig = normalizeSelectionConfig(

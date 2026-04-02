@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createSurveyAction } from "@/app/admin/surveys/actions";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
-import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
+import { formatDateTimeLocalInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -67,35 +67,27 @@ export default async function AdminSurveyNewPage({
                 </label>
               </div>
 
-              <div className="triple-fields">
+              <div className="double-fields">
                 <label className="field">
-                  <span>開催日</span>
+                  <span>開始日時</span>
                   <input
-                    defaultValue={sourceSurvey ? formatDateInputInTokyo(sourceSurvey.startsAt) : "2026-04-10"}
-                    name="eventDate"
+                    defaultValue={sourceSurvey ? formatDateTimeLocalInputInTokyo(sourceSurvey.startsAt) : "2026-04-10T09:00"}
+                    name="startsAt"
                     required
-                    type="date"
+                    type="datetime-local"
                   />
                 </label>
                 <label className="field">
-                  <span>開始時刻</span>
+                  <span>終了日時</span>
                   <input
-                    defaultValue={sourceSurvey ? formatTimeInputInTokyo(sourceSurvey.startsAt) : "09:00"}
-                    name="startTime"
+                    defaultValue={sourceSurvey ? formatDateTimeLocalInputInTokyo(sourceSurvey.endsAt) : "2026-04-10T11:00"}
+                    name="endsAt"
                     required
-                    type="time"
-                  />
-                </label>
-                <label className="field">
-                  <span>終了時刻</span>
-                  <input
-                    defaultValue={sourceSurvey ? formatTimeInputInTokyo(sourceSurvey.endsAt) : "11:00"}
-                    name="endTime"
-                    required
-                    type="time"
+                    type="datetime-local"
                   />
                 </label>
               </div>
+              <p className="helper-text">日をまたぐ活動も、そのまま開始日時と終了日時を入力できます。</p>
 
               <label className="field">
                 <span>締切日時</span>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { updateSurveyAction } from "@/app/admin/surveys/actions";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
-import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
+import { formatDateTimeLocalInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -75,20 +75,27 @@ export default async function AdminSurveyEditPage({
                 </label>
               </div>
 
-              <div className="triple-fields">
+              <div className="double-fields">
                 <label className="field">
-                  <span>開催日</span>
-                  <input defaultValue={formatDateInputInTokyo(survey.startsAt)} name="eventDate" required type="date" />
+                  <span>開始日時</span>
+                  <input
+                    defaultValue={formatDateTimeLocalInputInTokyo(survey.startsAt)}
+                    name="startsAt"
+                    required
+                    type="datetime-local"
+                  />
                 </label>
                 <label className="field">
-                  <span>開始時刻</span>
-                  <input defaultValue={formatTimeInputInTokyo(survey.startsAt)} name="startTime" required type="time" />
-                </label>
-                <label className="field">
-                  <span>終了時刻</span>
-                  <input defaultValue={formatTimeInputInTokyo(survey.endsAt)} name="endTime" required type="time" />
+                  <span>終了日時</span>
+                  <input
+                    defaultValue={formatDateTimeLocalInputInTokyo(survey.endsAt)}
+                    name="endsAt"
+                    required
+                    type="datetime-local"
+                  />
                 </label>
               </div>
+              <p className="helper-text">複数日にまたがる活動も開始日時と終了日時だけで登録できます。</p>
 
               <label className="field">
                 <span>締切日時</span>
