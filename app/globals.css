@@ -888,12 +888,18 @@ input[type="checkbox"] {
   }
 
   .table-head.recent-survey-table,
-  .table-head.admin-survey-table {
+  .table-head.admin-survey-table,
+  .table-head.applications-summary-table,
+  .table-head.answers,
+  .table-head.message-log-table {
     display: none;
   }
 
   .table-row.recent-survey-table,
-  .table-row.admin-survey-table {
+  .table-row.admin-survey-table,
+  .table-row.applications-summary-table,
+  .table-row.answers,
+  .table-row.message-log-table {
     gap: 14px;
     padding: 18px 0;
   }

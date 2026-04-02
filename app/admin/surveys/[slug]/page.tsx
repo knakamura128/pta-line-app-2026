@@ -162,22 +162,30 @@ export default async function AdminSurveyDetailPage({
           </div>
           {survey.applications.map((application, index) => (
             <div className="table-row answers" key={application.id}>
-              <span>
-                {application.familyName} / {application.displayName}
-                <br />
-                <small>
-                  {application.childGrade}年 {application.childClass}
-                </small>
-              </span>
-              <span>{formatDateTimeInTokyo(application.createdAt)}</span>
-              <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
-                {index < survey.capacity ? "確定候補" : "確定前"}
-              </span>
-              <span>
-                {Array.isArray(application.selectionAnswers) && application.selectionAnswers.length > 0
-                  ? application.selectionAnswers.join(" / ")
-                  : application.note || "-"}
-              </span>
+              <div className="mobile-table-cell" data-label="回答者">
+                <span>
+                  {application.familyName} / {application.displayName}
+                  <br />
+                  <small>
+                    {application.childGrade}年 {application.childClass}
+                  </small>
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="回答日時">
+                <span>{formatDateTimeInTokyo(application.createdAt)}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="状態">
+                <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
+                  {index < survey.capacity ? "確定候補" : "確定前"}
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="回答内容">
+                <span>
+                  {Array.isArray(application.selectionAnswers) && application.selectionAnswers.length > 0
+                    ? application.selectionAnswers.join(" / ")
+                    : application.note || "-"}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -196,13 +204,23 @@ export default async function AdminSurveyDetailPage({
           </div>
           {recentMessageDeliveries.map((delivery) => (
             <div className="table-row message-log-table" key={delivery.id}>
-              <span>{delivery.kind === "RECEIPT" ? "受付通知" : "確定通知"}</span>
-              <span>{delivery.application ? `${delivery.application.familyName} / ${delivery.application.displayName}` : "-"}</span>
-              <span className={`tag ${delivery.status === "SENT" ? "confirmed" : "closed"}`}>
-                {delivery.status === "SENT" ? "成功" : "失敗"}
-              </span>
-              <span>{formatDateTimeInTokyo(delivery.createdAt)}</span>
-              <span>{delivery.errorMessage || "-"}</span>
+              <div className="mobile-table-cell" data-label="送信種別">
+                <span>{delivery.kind === "RECEIPT" ? "受付通知" : "確定通知"}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="対象者">
+                <span>{delivery.application ? `${delivery.application.familyName} / ${delivery.application.displayName}` : "-"}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="結果">
+                <span className={`tag ${delivery.status === "SENT" ? "confirmed" : "closed"}`}>
+                  {delivery.status === "SENT" ? "成功" : "失敗"}
+                </span>
+              </div>
+              <div className="mobile-table-cell" data-label="送信時刻">
+                <span>{formatDateTimeInTokyo(delivery.createdAt)}</span>
+              </div>
+              <div className="mobile-table-cell" data-label="失敗理由">
+                <span>{delivery.errorMessage || "-"}</span>
+              </div>
             </div>
           ))}
         </div>
