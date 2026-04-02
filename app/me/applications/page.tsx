@@ -31,6 +31,10 @@ type MyApplication = {
   };
 };
 
+type ErrorPayload = {
+  message?: string;
+};
+
 export default function MyApplicationsPage() {
   const [applications, setApplications] = useState<MyApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +102,7 @@ export default function MyApplicationsPage() {
     async function loadApplications() {
       try {
         const response = await fetch(`/api/me/applications?lineUserId=${encodeURIComponent(lineUserId)}`);
-        const data = (await response.json()) as MyApplication[] | { message: string };
+        const data = (await readJson(response)) as MyApplication[] | ErrorPayload;
 
         if (!response.ok) {
           throw new Error("message" in data ? data.message : "応募一覧の取得に失敗しました。");
@@ -168,6 +172,21 @@ export default function MyApplicationsPage() {
       </main>
     </div>
   );
+}
+
+async function readJson(response: Response) {
+  const text = await response.text();
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      message: response.ok ? "レスポンスの解析に失敗しました。" : text
+    };
+  }
 }
 
 function renderLiffStatus(status: LiffStatus) {

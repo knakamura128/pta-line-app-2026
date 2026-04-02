@@ -38,6 +38,10 @@ type MyApplication = {
   };
 };
 
+type ErrorPayload = {
+  message?: string;
+};
+
 export default function Home() {
   const router = useRouter();
   const [isLineAuthed, setIsLineAuthed] = useState(false);
@@ -102,13 +106,13 @@ export default function Home() {
     async function loadSurveys() {
       try {
         const response = await fetch("/api/surveys");
+        const data = (await readJson(response)) as Survey[] | ErrorPayload;
         if (!response.ok) {
-          throw new Error("募集一覧の取得に失敗しました。");
+          throw new Error("message" in data ? data.message || "募集一覧の取得に失敗しました。" : "募集一覧の取得に失敗しました。");
         }
 
-        const data = (await response.json()) as Survey[];
         if (!mounted) return;
-        setSurveys(data);
+        setSurveys(data as Survey[]);
       } catch (error) {
         if (!mounted) return;
         setLiffError(error instanceof Error ? error.message : "募集一覧の取得に失敗しました。");
@@ -136,7 +140,7 @@ export default function Home() {
     async function loadMyApplications() {
       try {
         const response = await fetch(`/api/me/applications?lineUserId=${encodeURIComponent(lineUserId)}`);
-        const data = (await response.json()) as MyApplication[] | { message: string };
+        const data = (await readJson(response)) as MyApplication[] | ErrorPayload;
 
         if (!response.ok) {
           throw new Error("message" in data ? data.message : "応募済み情報の取得に失敗しました。");
@@ -246,7 +250,7 @@ export default function Home() {
         })
       });
 
-      const data = (await response.json()) as { message: string };
+      const data = (await readJson(response)) as ErrorPayload;
       if (!response.ok) {
         throw new Error(data.message);
       }
@@ -323,4 +327,19 @@ export default function Home() {
       </main>
     </div>
   );
+}
+
+async function readJson(response: Response) {
+  const text = await response.text();
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      message: response.ok ? "レスポンスの解析に失敗しました。" : text
+    };
+  }
 }
