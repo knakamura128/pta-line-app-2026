@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
       revalidateAdminPaths(updatedSurvey.slug);
       return NextResponse.redirect(
-        new URL(`/admin/surveys/${updatedSurvey.slug}?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`, request.url),
+        new URL(`/admin/surveys/view?id=${updatedSurvey.id}&saved=${input.status === "PUBLISHED" ? "published" : "draft"}`, request.url),
         { status: 303 }
       );
     }

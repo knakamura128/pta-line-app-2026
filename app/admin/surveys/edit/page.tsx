@@ -40,7 +40,7 @@ export default async function AdminSurveyEditPage({
           </div>
           <div className="hero-inline">
             {survey.status !== "DRAFT" ? (
-              <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
+              <Link className="text-link" href={`/admin/surveys/view?id=${survey.id}`}>
                 回答一覧へ
               </Link>
             ) : null}
@@ -151,7 +151,7 @@ export default async function AdminSurveyEditPage({
                 下書き保存
               </button>
               {survey.status !== "DRAFT" ? (
-                <Link className="ghost-button" href={`/admin/surveys/${survey.slug}`}>
+                <Link className="ghost-button" href={`/admin/surveys/view?id=${survey.id}`}>
                   回答一覧
                 </Link>
               ) : (

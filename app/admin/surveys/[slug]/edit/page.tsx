@@ -34,7 +34,7 @@ export default async function AdminSurveyEditPage({
             <h3>募集編集</h3>
           </div>
           <div className="hero-inline">
-            <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
+            <Link className="text-link" href={`/admin/surveys/view?id=${survey.id}`}>
               回答一覧へ
             </Link>
             <Link className="ghost-button small" href="/admin/surveys">
@@ -142,7 +142,7 @@ export default async function AdminSurveyEditPage({
               <button className="ghost-button" name="mode" type="submit" value="draft">
                 下書き保存
               </button>
-              <Link className="ghost-button" href={`/admin/surveys/${survey.slug}`}>
+              <Link className="ghost-button" href={`/admin/surveys/view?id=${survey.id}`}>
                 回答一覧
               </Link>
               <button className="primary-button" name="mode" type="submit" value="publish">

@@ -10,6 +10,8 @@ import { normalizeSelectionConfig } from "@/lib/survey-selection";
 type SaveMode = "draft" | "publish";
 
 export async function createSurveyAction(formData: FormData) {
+  let redirectPath = "/admin/surveys";
+
   try {
     const input = parseSurveyFormData(formData);
     const slug = await generateUniqueSlug(input.title);
@@ -40,10 +42,12 @@ export async function createSurveyAction(formData: FormData) {
     });
 
     revalidateAdminPaths();
-    redirect(`/admin/surveys?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+    redirectPath = `/admin/surveys?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`;
   } catch (error) {
     redirect(`/admin/surveys/new?error=${encodeURIComponent(readErrorMessage(error))}`);
   }
+
+  redirect(redirectPath);
 }
 
 export async function updateSurveyAction(formData: FormData) {
@@ -52,6 +56,8 @@ export async function updateSurveyAction(formData: FormData) {
   if (!surveyId) {
     throw new Error("募集IDが不足しています。");
   }
+
+  let redirectPath = `/admin/surveys/edit?id=${surveyId}`;
 
   try {
     const input = parseSurveyFormData(formData);
@@ -90,10 +96,12 @@ export async function updateSurveyAction(formData: FormData) {
     });
 
     revalidateAdminPaths(updatedSurvey.slug);
-    redirect(`/admin/surveys/${updatedSurvey.slug}?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+    redirectPath = `/admin/surveys/${updatedSurvey.slug}?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`;
   } catch (error) {
     redirect(`/admin/surveys/edit?id=${surveyId}&error=${encodeURIComponent(readErrorMessage(error))}`);
   }
+
+  redirect(redirectPath);
 }
 
 export async function sendConfirmationMessagesAction(formData: FormData) {
@@ -148,7 +156,7 @@ export async function sendConfirmationMessagesAction(formData: FormData) {
   }
 
   revalidateAdminPaths(survey.slug);
-  redirect(`/admin/surveys/${survey.slug}?confirmationSent=${sentCount}&confirmationFailed=${failedCount}`);
+  redirect(`/admin/surveys/view?id=${survey.id}&confirmationSent=${sentCount}&confirmationFailed=${failedCount}`);
 }
 
 export async function deleteSurveyAction(formData: FormData) {

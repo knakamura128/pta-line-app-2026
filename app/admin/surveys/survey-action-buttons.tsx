@@ -21,7 +21,7 @@ export function SurveyActionButtons({
         複製して新規
       </Link>
       {!isDraft ? (
-        <Link className="primary-button small" href={`/admin/surveys/${surveySlug}`}>
+        <Link className="primary-button small" href={`/admin/surveys/view?id=${surveyId}`}>
           回答を確認
         </Link>
       ) : (

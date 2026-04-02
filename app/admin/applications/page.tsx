@@ -84,7 +84,7 @@ export default async function AdminApplicationsPage() {
                 <span>{survey.capacity}</span>
               </div>
               <div className="mobile-table-cell" data-label="詳細">
-                <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
+                <Link className="text-link" href={`/admin/surveys/view?id=${survey.id}`}>
                   集計を見る
                 </Link>
               </div>
