@@ -12,10 +12,10 @@ export const dynamic = "force-dynamic";
 export default async function AdminSurveyEditPage({
   searchParams
 }: {
-  searchParams: Promise<{ id?: string }>;
+  searchParams: Promise<{ id?: string; error?: string }>;
 }) {
   await ensureSeedData();
-  const { id } = await searchParams;
+  const { id, error } = await searchParams;
 
   if (!id) {
     notFound();
@@ -52,6 +52,12 @@ export default async function AdminSurveyEditPage({
         </div>
 
         <div className="table-card">
+          {error ? (
+            <div className="inline-notice">
+              <strong>保存できませんでした。</strong>
+              <span>{error}</span>
+            </div>
+          ) : null}
           <form action={updateSurveyAction}>
             <input name="surveyId" type="hidden" value={survey.id} />
             <div className="form-layout">

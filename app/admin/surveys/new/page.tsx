@@ -11,10 +11,10 @@ export const dynamic = "force-dynamic";
 export default async function AdminSurveyNewPage({
   searchParams
 }: {
-  searchParams: Promise<{ copyFrom?: string }>;
+  searchParams: Promise<{ copyFrom?: string; error?: string }>;
 }) {
   await ensureSeedData();
-  const { copyFrom } = await searchParams;
+  const { copyFrom, error } = await searchParams;
 
   const sourceSurvey = copyFrom
     ? await prisma.survey.findUnique({
@@ -45,6 +45,12 @@ export default async function AdminSurveyNewPage({
         ) : null}
 
         <div className="table-card">
+          {error ? (
+            <div className="inline-notice">
+              <strong>保存できませんでした。</strong>
+              <span>{error}</span>
+            </div>
+          ) : null}
           <form action={createSurveyAction}>
             <div className="form-layout">
               <label className="field">

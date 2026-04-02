@@ -10,81 +10,90 @@ import { normalizeSelectionConfig } from "@/lib/survey-selection";
 type SaveMode = "draft" | "publish";
 
 export async function createSurveyAction(formData: FormData) {
-  const input = parseSurveyFormData(formData);
-  const slug = await generateUniqueSlug(input.title);
+  try {
+    const input = parseSurveyFormData(formData);
+    const slug = await generateUniqueSlug(input.title);
 
-  await prisma.survey.create({
-    data: {
-      slug,
-      title: input.title,
-      committee: input.committee,
-      description: input.description,
-      workDetails: input.workDetails,
-      confirmationMessage: input.confirmationMessage,
-      selectionTitle: input.selectionTitle,
-      selectionType: input.selectionType,
-      selectionOptions: input.selectionOptions,
-      selectionOptionLimits: input.selectionOptionLimits,
-      useDateRange: input.useDateRange,
-      eventStartDate: input.eventStartDate,
-      eventEndDate: input.eventEndDate,
-      eventStartTime: input.eventStartTime,
-      eventEndTime: input.eventEndTime,
-      startsAt: input.startsAt,
-      endsAt: input.endsAt,
-      closeAt: input.closeAt,
-      capacity: input.capacity,
-      status: input.status
-    }
-  });
+    await prisma.survey.create({
+      data: {
+        slug,
+        title: input.title,
+        committee: input.committee,
+        description: input.description,
+        workDetails: input.workDetails,
+        confirmationMessage: input.confirmationMessage,
+        selectionTitle: input.selectionTitle,
+        selectionType: input.selectionType,
+        selectionOptions: input.selectionOptions,
+        selectionOptionLimits: input.selectionOptionLimits,
+        useDateRange: input.useDateRange,
+        eventStartDate: input.eventStartDate,
+        eventEndDate: input.eventEndDate,
+        eventStartTime: input.eventStartTime,
+        eventEndTime: input.eventEndTime,
+        startsAt: input.startsAt,
+        endsAt: input.endsAt,
+        closeAt: input.closeAt,
+        capacity: input.capacity,
+        status: input.status
+      }
+    });
 
-  revalidateAdminPaths();
-  redirect(`/admin/surveys?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+    revalidateAdminPaths();
+    redirect(`/admin/surveys?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+  } catch (error) {
+    redirect(`/admin/surveys/new?error=${encodeURIComponent(readErrorMessage(error))}`);
+  }
 }
 
 export async function updateSurveyAction(formData: FormData) {
-  const input = parseSurveyFormData(formData);
   const surveyId = readString(formData, "surveyId");
 
   if (!surveyId) {
     throw new Error("募集IDが不足しています。");
   }
 
-  await prisma.survey.update({
-    where: {
-      id: surveyId
-    },
-    data: {
-      title: input.title,
-      committee: input.committee,
-      description: input.description,
-      workDetails: input.workDetails,
-      confirmationMessage: input.confirmationMessage,
-      selectionTitle: input.selectionTitle,
-      selectionType: input.selectionType,
-      selectionOptions: input.selectionOptions,
-      selectionOptionLimits: input.selectionOptionLimits,
-      useDateRange: input.useDateRange,
-      eventStartDate: input.eventStartDate,
-      eventEndDate: input.eventEndDate,
-      eventStartTime: input.eventStartTime,
-      eventEndTime: input.eventEndTime,
-      startsAt: input.startsAt,
-      endsAt: input.endsAt,
-      closeAt: input.closeAt,
-      capacity: input.capacity,
-      status: input.status
-    }
-  });
+  try {
+    const input = parseSurveyFormData(formData);
 
-  const updatedSurvey = await prisma.survey.findUniqueOrThrow({
-    where: {
-      id: surveyId
-    }
-  });
+    await prisma.survey.update({
+      where: {
+        id: surveyId
+      },
+      data: {
+        title: input.title,
+        committee: input.committee,
+        description: input.description,
+        workDetails: input.workDetails,
+        confirmationMessage: input.confirmationMessage,
+        selectionTitle: input.selectionTitle,
+        selectionType: input.selectionType,
+        selectionOptions: input.selectionOptions,
+        selectionOptionLimits: input.selectionOptionLimits,
+        useDateRange: input.useDateRange,
+        eventStartDate: input.eventStartDate,
+        eventEndDate: input.eventEndDate,
+        eventStartTime: input.eventStartTime,
+        eventEndTime: input.eventEndTime,
+        startsAt: input.startsAt,
+        endsAt: input.endsAt,
+        closeAt: input.closeAt,
+        capacity: input.capacity,
+        status: input.status
+      }
+    });
 
-  revalidateAdminPaths(updatedSurvey.slug);
-  redirect(`/admin/surveys/${updatedSurvey.slug}?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+    const updatedSurvey = await prisma.survey.findUniqueOrThrow({
+      where: {
+        id: surveyId
+      }
+    });
+
+    revalidateAdminPaths(updatedSurvey.slug);
+    redirect(`/admin/surveys/${updatedSurvey.slug}?saved=${input.status === "PUBLISHED" ? "published" : "draft"}`);
+  } catch (error) {
+    redirect(`/admin/surveys/edit?id=${surveyId}&error=${encodeURIComponent(readErrorMessage(error))}`);
+  }
 }
 
 export async function sendConfirmationMessagesAction(formData: FormData) {
@@ -180,11 +189,7 @@ function parseSurveyFormData(formData: FormData) {
   const selectionType = readSelectionType(formData);
   const selectionOptionLabels = formData.getAll("selectionOptionLabel").map((value) => (typeof value === "string" ? value : ""));
   const selectionOptionLimits = formData.getAll("selectionOptionLimit").map((value) => (typeof value === "string" ? value : ""));
-  const useDateRange = readString(formData, "useDateRange") === "true";
-  const startDate = readRequiredString(formData, "startDate");
-  const endDate = readRequiredString(formData, "endDate");
-  const startTime = readRequiredString(formData, "startTime");
-  const endTime = readRequiredString(formData, "endTime");
+  const schedule = readScheduleFields(formData);
   const closeAt = readRequiredString(formData, "closeAt");
   const capacityValue = Number(readRequiredString(formData, "capacity"));
 
@@ -192,15 +197,15 @@ function parseSurveyFormData(formData: FormData) {
     throw new Error("募集人数は1以上の整数で入力してください。");
   }
 
-  const startsAt = new Date(`${startDate}T${startTime}:00+09:00`);
-  const endsAt = new Date(`${endDate}T${endTime}:00+09:00`);
+  const startsAt = new Date(`${schedule.startDate}T${schedule.startTime}:00+09:00`);
+  const endsAt = new Date(`${schedule.endDate}T${schedule.endTime}:00+09:00`);
   const closeAtDate = new Date(`${closeAt}:00+09:00`);
 
   if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()) || Number.isNaN(closeAtDate.getTime())) {
     throw new Error("日時の形式が不正です。");
   }
 
-  if (useDateRange && startDate > endDate) {
+  if (schedule.useDateRange && schedule.startDate > schedule.endDate) {
     throw new Error("終了日は開始日以降にしてください。");
   }
 
@@ -225,17 +230,61 @@ function parseSurveyFormData(formData: FormData) {
     selectionType: selectionConfig.selectionType,
     selectionOptions: selectionConfig.selectionOptions,
     selectionOptionLimits: selectionConfig.selectionOptionLimits,
-    useDateRange,
-    eventStartDate: new Date(`${startDate}T00:00:00+09:00`),
-    eventEndDate: new Date(`${endDate}T00:00:00+09:00`),
-    eventStartTime: startTime,
-    eventEndTime: endTime,
+    useDateRange: schedule.useDateRange,
+    eventStartDate: new Date(`${schedule.startDate}T00:00:00+09:00`),
+    eventEndDate: new Date(`${schedule.endDate}T00:00:00+09:00`),
+    eventStartTime: schedule.startTime,
+    eventEndTime: schedule.endTime,
     startsAt,
     endsAt,
     closeAt: closeAtDate,
     capacity: capacityValue,
     status: mode === "publish" ? SurveyStatus.PUBLISHED : SurveyStatus.DRAFT
   };
+}
+
+function readScheduleFields(formData: FormData) {
+  const useDateRange = readString(formData, "useDateRange") === "true";
+  const startDate = readString(formData, "startDate");
+  const endDate = readString(formData, "endDate");
+  const startTime = readString(formData, "startTime");
+  const endTime = readString(formData, "endTime");
+
+  if (startDate && endDate && startTime && endTime) {
+    return {
+      useDateRange,
+      startDate,
+      endDate,
+      startTime,
+      endTime
+    };
+  }
+
+  const legacyStartsAt = readString(formData, "startsAt");
+  const legacyEndsAt = readString(formData, "endsAt");
+
+  if (legacyStartsAt && legacyEndsAt) {
+    return {
+      useDateRange: true,
+      startDate: legacyStartsAt.slice(0, 10),
+      endDate: legacyEndsAt.slice(0, 10),
+      startTime: legacyStartsAt.slice(11, 16),
+      endTime: legacyEndsAt.slice(11, 16)
+    };
+  }
+
+  const legacyEventDate = readString(formData, "eventDate");
+  if (legacyEventDate && startTime && endTime) {
+    return {
+      useDateRange: false,
+      startDate: legacyEventDate,
+      endDate: legacyEventDate,
+      startTime,
+      endTime
+    };
+  }
+
+  throw new Error("開催日時の入力内容を読み取れませんでした。画面を再読み込みしてもう一度お試しください。");
 }
 
 function readMode(formData: FormData): SaveMode {
@@ -274,6 +323,14 @@ function readRequiredString(formData: FormData, key: string) {
 function readString(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
+}
+
+function readErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "保存処理に失敗しました。";
 }
 
 async function generateUniqueSlug(title: string) {
