@@ -218,9 +218,6 @@ export default function Home() {
         <div className="hero-copy-wrap">
           <p className="eyebrow">PTA Volunteer Board</p>
           <h1>活動募集一覧</h1>
-          <p className="hero-copy">
-            PTA活動の募集をLINEミニアプリから確認できます。応募時にのみLINE認証を行います。
-          </p>
           <div className="hero-inline">
             <span className="status-pill">{isLineAuthed ? lineProfile?.displayName ?? "認証済み" : "未認証"}</span>
             <Link className="text-link" href="/me/applications">
@@ -234,7 +231,6 @@ export default function Home() {
         <div className="summary-card">
           <span>次回締切</span>
           <strong>3月22日 18:00</strong>
-          <p>応募ボタン押下時にLINE認証し、その後に応募内容入力へ進む想定です。</p>
         </div>
       </header>
 
