@@ -298,7 +298,7 @@ export default function Home() {
             <article className="survey-card survey-open" key={survey.id}>
               <div className="survey-meta">
                 <span>{survey.committee}</span>
-                <span>{formatSurveyScheduleInTokyo(survey)}</span>
+                <span>{`開催期間：${formatSurveyScheduleInTokyo(survey)}`}</span>
               </div>
               <h2>{survey.title}</h2>
               <p>{survey.description}</p>

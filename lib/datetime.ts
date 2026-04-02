@@ -32,7 +32,7 @@ export function formatSurveyScheduleInTokyo(schedule: SurveyScheduleLike) {
     const endDate = getDateParts(schedule.eventEndDate);
     const hasMultipleDates = `${startDate.year}-${startDate.month}-${startDate.day}` !== `${endDate.year}-${endDate.month}-${endDate.day}`;
     const dateLabel =
-      (schedule.useDateRange || hasMultipleDates)
+      hasMultipleDates
         ? `${Number(startDate.month)}/${Number(startDate.day)}-${Number(endDate.month)}/${Number(endDate.day)}`
         : `${Number(startDate.month)}/${Number(startDate.day)}`;
 
