@@ -172,3 +172,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "応募登録に失敗しました。" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  await ensureSeedData();
+
+  const body = (await request.json()) as ApplyRequest;
+
+  if (!body.surveyId || !body.lineUserId) {
+    return NextResponse.json({ message: "募集IDとLINEユーザーIDが必要です。" }, { status: 400 });
+  }
+
+  const existing = await prisma.application.findUnique({
+    where: {
+      surveyId_lineUserId: {
+        surveyId: body.surveyId,
+        lineUserId: body.lineUserId
+      }
+    }
+  });
+
+  if (!existing) {
+    return NextResponse.json({ message: "応募データが見つかりません。" }, { status: 404 });
+  }
+
+  await prisma.application.delete({
+    where: {
+      surveyId_lineUserId: {
+        surveyId: body.surveyId,
+        lineUserId: body.lineUserId
+      }
+    }
+  });
+
+  return NextResponse.json({ message: "応募を取り消しました。" });
+}

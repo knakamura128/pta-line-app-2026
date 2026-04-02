@@ -43,6 +43,7 @@ export default function Home() {
   const [myApplicationSlugs, setMyApplicationSlugs] = useState<string[]>([]);
   const [surveysLoading, setSurveysLoading] = useState(true);
   const [pendingSurveySlug, setPendingSurveySlug] = useState<string | null>(null);
+  const [cancellingSurveySlug, setCancellingSurveySlug] = useState<string | null>(null);
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
 
   useEffect(() => {
@@ -213,6 +214,52 @@ export default function Home() {
       setLiffError(error instanceof Error ? error.message : "LINE認証に失敗しました。");
     }
   }
+
+  async function handleCancelApplication(surveyId: string, surveySlug: string) {
+    if (!lineProfile) {
+      setLiffError("LINE認証後に取り消してください。");
+      return;
+    }
+
+    const confirmed = window.confirm("この応募を取り消しますか？");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setCancellingSurveySlug(surveySlug);
+      setLiffError(null);
+
+      const response = await fetch("/api/applications", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          surveyId,
+          lineUserId: lineProfile.userId
+        })
+      });
+
+      const data = (await response.json()) as { message: string };
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      setMyApplicationSlugs((current) => current.filter((slug) => slug !== surveySlug));
+      setSurveys((current) =>
+        current.map((survey) =>
+          survey.slug === surveySlug
+            ? { ...survey, currentApplications: Math.max(survey.currentApplications - 1, 0) }
+            : survey
+        )
+      );
+    } catch (error) {
+      setLiffError(error instanceof Error ? error.message : "応募の取り消しに失敗しました。");
+    } finally {
+      setCancellingSurveySlug(null);
+    }
+  }
   return (
     <div className="landing-shell">
       <header className="landing-hero">
@@ -255,6 +302,16 @@ export default function Home() {
               <button className="primary-button wide" onClick={() => handleApply(survey.slug)} type="button">
                 {myApplicationSlugs.includes(survey.slug) ? "応募済み / 編集する" : "応募する"}
               </button>
+              {myApplicationSlugs.includes(survey.slug) ? (
+                <button
+                  className="danger-button wide secondary-action"
+                  disabled={cancellingSurveySlug === survey.slug}
+                  onClick={() => handleCancelApplication(survey.id, survey.slug)}
+                  type="button"
+                >
+                  {cancellingSurveySlug === survey.slug ? "取り消し中..." : "応募を取り消す"}
+                </button>
+              ) : null}
             </article>
           ))}
         </section>

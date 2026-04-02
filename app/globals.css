@@ -621,6 +621,10 @@ input[type="checkbox"] {
   width: 100%;
 }
 
+.secondary-action {
+  margin-top: 10px;
+}
+
 .answer-item {
   padding: 16px;
   display: flex;

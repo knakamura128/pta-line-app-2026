@@ -58,6 +58,7 @@ export default function SurveyDetailPage() {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lineProfile, setLineProfile] = useState<LineProfile | null>(null);
@@ -150,6 +151,28 @@ export default function SurveyDetailPage() {
     };
   }, [params.slug, lineProfile]);
 
+  async function reloadSurvey() {
+    if (!lineProfile) {
+      return;
+    }
+
+    const query = `?lineUserId=${encodeURIComponent(lineProfile.userId)}`;
+    const response = await fetch(`/api/surveys/${params.slug}${query}`);
+    const data = (await response.json()) as SurveyDetail | { message: string };
+
+    if (!response.ok) {
+      throw new Error("message" in data ? data.message : "募集の取得に失敗しました。");
+    }
+
+    const nextSurvey = data as SurveyDetail;
+    setSurvey(nextSurvey);
+    setFamilyName(nextSurvey.existingApplication?.familyName ?? "");
+    setChildGrade(nextSurvey.existingApplication?.childGrade ?? "");
+    setChildClass(nextSurvey.existingApplication?.childClass ?? "");
+    setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
+    setNote(nextSurvey.existingApplication?.note ?? "");
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -204,6 +227,47 @@ export default function SurveyDetailPage() {
       setErrorMessage(error instanceof Error ? error.message : "応募登録に失敗しました。");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleCancel() {
+    if (!survey || !lineProfile || !survey.existingApplication) {
+      return;
+    }
+
+    const confirmed = window.confirm("この応募を取り消しますか？");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setCancelling(true);
+      setMessage(null);
+      setErrorMessage(null);
+
+      const response = await fetch("/api/applications", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          surveyId: survey.id,
+          lineUserId: lineProfile.userId
+        })
+      });
+
+      const data = (await response.json()) as { message: string };
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      setMessage(data.message);
+      await reloadSurvey();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "応募の取り消しに失敗しました。");
+    } finally {
+      setCancelling(false);
     }
   }
 
@@ -367,9 +431,19 @@ export default function SurveyDetailPage() {
                 </div>
               </div>
             ) : null}
-            <button className="primary-button wide" disabled={submitting || !survey || !lineProfile} type="submit">
+            <button className="primary-button wide" disabled={submitting || cancelling || !survey || !lineProfile} type="submit">
               {submitting ? "保存中..." : survey?.existingApplication ? "応募済み / 編集する" : "この内容で応募する"}
             </button>
+            {survey?.existingApplication ? (
+              <button
+                className="danger-button wide secondary-action"
+                disabled={submitting || cancelling}
+                onClick={handleCancel}
+                type="button"
+              >
+                {cancelling ? "取り消し中..." : "応募を取り消す"}
+              </button>
+            ) : null}
           </form>
         </aside>
       </main>
