@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { formatDateTimeInTokyo, formatScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -233,7 +234,7 @@ export default function SurveyDetailPage() {
           <strong>
             {survey ? `${survey.currentApplications} / ${survey.capacity} 名` : "読込中"}
           </strong>
-          <p>{survey ? `締切 ${formatDateTime(survey.closeAt)}` : "募集情報を取得しています。"}</p>
+          <p>{survey ? `締切 ${formatDateTimeInTokyo(survey.closeAt)}` : "募集情報を取得しています。"}</p>
         </div>
       </header>
 
@@ -248,18 +249,18 @@ export default function SurveyDetailPage() {
             <article className="survey-card survey-open">
               <div className="survey-meta">
                 <span>{survey.committee}</span>
-                <span>{formatSchedule(survey.startsAt, survey.endsAt)}</span>
+                <span>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</span>
               </div>
               <h2>{survey.title}</h2>
               <p>{survey.description}</p>
               <div className="detail-stack">
                 <div className="detail-block">
                   <p className="detail-title">開催日時</p>
-                  <p>{formatSchedule(survey.startsAt, survey.endsAt)}</p>
+                  <p>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</p>
                 </div>
                 <div className="detail-block">
                   <p className="detail-title">締切日時</p>
-                  <p>{formatDateTime(survey.closeAt)}</p>
+                  <p>{formatDateTimeInTokyo(survey.closeAt)}</p>
                 </div>
                 <div className="detail-block">
                   <p className="detail-title">お仕事内容</p>
@@ -374,22 +375,6 @@ export default function SurveyDetailPage() {
       </main>
     </div>
   );
-}
-
-function formatSchedule(startsAt: string, endsAt: string) {
-  const start = new Date(startsAt);
-  const end = new Date(endsAt);
-
-  return `${start.getMonth() + 1}/${start.getDate()} ${pad(start.getHours())}:${pad(start.getMinutes())}-${pad(end.getHours())}:${pad(end.getMinutes())}`;
-}
-
-function formatDateTime(value: string) {
-  const date = new Date(value);
-  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }
 
 function renderLiffStatus(status: LiffStatus) {

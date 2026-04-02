@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { formatDateTimeInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -103,7 +104,7 @@ export default async function AdminApplicationsPage() {
                   {application.childGrade}年 {application.childClass}
                 </small>
               </span>
-              <span>{formatDateTime(application.createdAt)}</span>
+              <span>{formatDateTimeInTokyo(application.createdAt)}</span>
               <span className={`tag ${index < application.survey.capacity ? "confirmed" : "pending"}`}>
                 {index < application.survey.capacity ? "確定候補" : "確定前"}
               </span>
@@ -147,12 +148,4 @@ export default async function AdminApplicationsPage() {
       </section>
     </main>
   );
-}
-
-function formatDateTime(value: Date) {
-  return `${value.getFullYear()}/${pad(value.getMonth() + 1)}/${pad(value.getDate())} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }

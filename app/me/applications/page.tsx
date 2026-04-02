@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { formatDateTimeInTokyo, formatScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -144,14 +145,14 @@ export default function MyApplicationsPage() {
             <article className="survey-card survey-open" key={application.id}>
               <div className="survey-meta">
                 <span>{application.survey.committee}</span>
-                <span>{formatSchedule(application.survey.startsAt, application.survey.endsAt)}</span>
+                <span>{formatScheduleInTokyo(application.survey.startsAt, application.survey.endsAt)}</span>
               </div>
               <h2>{application.survey.title}</h2>
               <p>
                 {application.childGrade}年 {application.childClass}
               </p>
               <div className="capacity-row">
-                <span>締切 {formatDateTime(application.survey.closeAt)}</span>
+                <span>締切 {formatDateTimeInTokyo(application.survey.closeAt)}</span>
                 <Link className="primary-button text-button" href={`/surveys/${application.survey.slug}`}>
                   応募済み / 編集する
                 </Link>
@@ -162,22 +163,6 @@ export default function MyApplicationsPage() {
       </main>
     </div>
   );
-}
-
-function formatSchedule(startsAt: string, endsAt: string) {
-  const start = new Date(startsAt);
-  const end = new Date(endsAt);
-
-  return `${start.getMonth() + 1}/${start.getDate()} ${pad(start.getHours())}:${pad(start.getMinutes())}-${pad(end.getHours())}:${pad(end.getMinutes())}`;
-}
-
-function formatDateTime(value: string) {
-  const date = new Date(value);
-  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }
 
 function renderLiffStatus(status: LiffStatus) {

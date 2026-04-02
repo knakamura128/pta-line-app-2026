@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { formatScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -243,7 +244,7 @@ export default function Home() {
             <article className="survey-card survey-open" key={survey.id}>
               <div className="survey-meta">
                 <span>{survey.committee}</span>
-                <span>{formatSchedule(survey.startsAt, survey.endsAt)}</span>
+                <span>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</span>
               </div>
               <h2>{survey.title}</h2>
               <p>{survey.description}</p>
@@ -262,15 +263,4 @@ export default function Home() {
       </main>
     </div>
   );
-}
-
-function formatSchedule(startsAt: string, endsAt: string) {
-  const start = new Date(startsAt);
-  const end = new Date(endsAt);
-
-  return `${start.getMonth() + 1}/${start.getDate()} ${pad(start.getHours())}:${pad(start.getMinutes())}-${pad(end.getHours())}:${pad(end.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }

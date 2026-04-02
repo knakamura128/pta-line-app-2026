@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createSurveyAction } from "@/app/admin/surveys/actions";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -70,7 +71,7 @@ export default async function AdminSurveyNewPage({
                 <label className="field">
                   <span>開催日</span>
                   <input
-                    defaultValue={sourceSurvey ? formatDate(sourceSurvey.startsAt) : "2026-04-10"}
+                    defaultValue={sourceSurvey ? formatDateInputInTokyo(sourceSurvey.startsAt) : "2026-04-10"}
                     name="eventDate"
                     required
                     type="date"
@@ -79,7 +80,7 @@ export default async function AdminSurveyNewPage({
                 <label className="field">
                   <span>開始時刻</span>
                   <input
-                    defaultValue={sourceSurvey ? formatTime(sourceSurvey.startsAt) : "09:00"}
+                    defaultValue={sourceSurvey ? formatTimeInputInTokyo(sourceSurvey.startsAt) : "09:00"}
                     name="startTime"
                     required
                     type="time"
@@ -88,7 +89,7 @@ export default async function AdminSurveyNewPage({
                 <label className="field">
                   <span>終了時刻</span>
                   <input
-                    defaultValue={sourceSurvey ? formatTime(sourceSurvey.endsAt) : "11:00"}
+                    defaultValue={sourceSurvey ? formatTimeInputInTokyo(sourceSurvey.endsAt) : "11:00"}
                     name="endTime"
                     required
                     type="time"
@@ -99,7 +100,7 @@ export default async function AdminSurveyNewPage({
               <label className="field">
                 <span>締切日時</span>
                 <input
-                  defaultValue={sourceSurvey ? formatDateTimeLocal(sourceSurvey.closeAt) : "2026-04-07T18:00"}
+                  defaultValue={sourceSurvey ? formatDateTimeLocalInputInTokyo(sourceSurvey.closeAt) : "2026-04-07T18:00"}
                   name="closeAt"
                   required
                   type="datetime-local"
@@ -199,16 +200,4 @@ export default async function AdminSurveyNewPage({
       </section>
     </main>
   );
-}
-
-function formatDate(value: Date) {
-  return value.toISOString().slice(0, 10);
-}
-
-function formatTime(value: Date) {
-  return value.toISOString().slice(11, 16);
-}
-
-function formatDateTimeLocal(value: Date) {
-  return `${formatDate(value)}T${formatTime(value)}`;
 }

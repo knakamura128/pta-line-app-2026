@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sendConfirmationMessagesAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { formatDateTimeInTokyo, formatScheduleInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -113,11 +114,11 @@ export default async function AdminSurveyDetailPage({
           <div className="detail-stack admin-meta-stack">
             <div className="detail-block">
               <p className="detail-title">開催日時</p>
-              <p>{formatSchedule(survey.startsAt, survey.endsAt)}</p>
+              <p>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</p>
             </div>
             <div className="detail-block">
               <p className="detail-title">締切</p>
-              <p>{formatDateTime(survey.closeAt)}</p>
+              <p>{formatDateTimeInTokyo(survey.closeAt)}</p>
             </div>
             {survey.selectionType !== "NONE" && survey.selectionTitle ? (
               <div className="detail-block">
@@ -168,7 +169,7 @@ export default async function AdminSurveyDetailPage({
                   {application.childGrade}年 {application.childClass}
                 </small>
               </span>
-              <span>{formatDateTime(application.createdAt)}</span>
+              <span>{formatDateTimeInTokyo(application.createdAt)}</span>
               <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
                 {index < survey.capacity ? "確定候補" : "確定前"}
               </span>
@@ -200,7 +201,7 @@ export default async function AdminSurveyDetailPage({
               <span className={`tag ${delivery.status === "SENT" ? "confirmed" : "closed"}`}>
                 {delivery.status === "SENT" ? "成功" : "失敗"}
               </span>
-              <span>{formatDateTime(delivery.createdAt)}</span>
+              <span>{formatDateTimeInTokyo(delivery.createdAt)}</span>
               <span>{delivery.errorMessage || "-"}</span>
             </div>
           ))}
@@ -243,16 +244,4 @@ export default async function AdminSurveyDetailPage({
       </aside>
     </main>
   );
-}
-
-function formatSchedule(startsAt: Date, endsAt: Date) {
-  return `${startsAt.getMonth() + 1}/${startsAt.getDate()} ${pad(startsAt.getHours())}:${pad(startsAt.getMinutes())}-${pad(endsAt.getHours())}:${pad(endsAt.getMinutes())}`;
-}
-
-function formatDateTime(value: Date) {
-  return `${value.getFullYear()}/${pad(value.getMonth() + 1)}/${pad(value.getDate())} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { formatShortDateTimeInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -104,7 +105,7 @@ export default async function AdminPage() {
               <span>
                 {survey._count.applications} / {survey.capacity}
               </span>
-              <span>{formatShortDateTime(survey.closeAt)}</span>
+              <span>{formatShortDateTimeInTokyo(survey.closeAt)}</span>
             </div>
           ))}
           {recentSurveys.length === 0 ? <div className="table-row"><span>公開中の募集はまだありません。</span><span>-</span><span>-</span><span>-</span></div> : null}
@@ -112,12 +113,4 @@ export default async function AdminPage() {
       </section>
     </main>
   );
-}
-
-function formatShortDateTime(value: Date) {
-  return `${value.getMonth() + 1}/${pad(value.getDate())} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }

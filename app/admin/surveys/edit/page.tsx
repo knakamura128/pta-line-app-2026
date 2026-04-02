@@ -3,6 +3,7 @@ import Link from "next/link";
 import { updateSurveyAction } from "@/app/admin/surveys/actions";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -77,21 +78,21 @@ export default async function AdminSurveyEditPage({
               <div className="triple-fields">
                 <label className="field">
                   <span>開催日</span>
-                  <input defaultValue={formatDate(survey.startsAt)} name="eventDate" required type="date" />
+                  <input defaultValue={formatDateInputInTokyo(survey.startsAt)} name="eventDate" required type="date" />
                 </label>
                 <label className="field">
                   <span>開始時刻</span>
-                  <input defaultValue={formatTime(survey.startsAt)} name="startTime" required type="time" />
+                  <input defaultValue={formatTimeInputInTokyo(survey.startsAt)} name="startTime" required type="time" />
                 </label>
                 <label className="field">
                   <span>終了時刻</span>
-                  <input defaultValue={formatTime(survey.endsAt)} name="endTime" required type="time" />
+                  <input defaultValue={formatTimeInputInTokyo(survey.endsAt)} name="endTime" required type="time" />
                 </label>
               </div>
 
               <label className="field">
                 <span>締切日時</span>
-                <input defaultValue={formatDateTimeLocal(survey.closeAt)} name="closeAt" required type="datetime-local" />
+                <input defaultValue={formatDateTimeLocalInputInTokyo(survey.closeAt)} name="closeAt" required type="datetime-local" />
               </label>
 
               <label className="field">
@@ -167,16 +168,4 @@ export default async function AdminSurveyEditPage({
       </section>
     </main>
   );
-}
-
-function formatDate(value: Date) {
-  return value.toISOString().slice(0, 10);
-}
-
-function formatTime(value: Date) {
-  return value.toISOString().slice(11, 16);
-}
-
-function formatDateTimeLocal(value: Date) {
-  return `${formatDate(value)}T${formatTime(value)}`;
 }

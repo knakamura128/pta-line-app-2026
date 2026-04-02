@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SurveyActionButtons } from "@/app/admin/surveys/survey-action-buttons";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { formatDateTimeInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -61,7 +62,7 @@ export default async function AdminSurveysPage({
               <span>
                 {survey._count.applications} / {survey.capacity}
               </span>
-              <span>{formatDateTime(survey.closeAt)}</span>
+              <span>{formatDateTimeInTokyo(survey.closeAt)}</span>
               <SurveyActionButtons
                 isDraft={survey.status === "DRAFT"}
                 surveyId={survey.id}
@@ -115,12 +116,4 @@ function getSurveyTagClass(status: string, applicationCount: number, capacity: n
   }
 
   return applicationCount >= capacity ? "closed" : "active";
-}
-
-function formatDateTime(value: Date) {
-  return `${value.getFullYear()}/${pad(value.getMonth() + 1)}/${pad(value.getDate())} ${pad(value.getHours())}:${pad(value.getMinutes())}`;
-}
-
-function pad(value: number) {
-  return value.toString().padStart(2, "0");
 }
