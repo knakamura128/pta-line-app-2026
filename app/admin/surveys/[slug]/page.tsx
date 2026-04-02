@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sendConfirmationMessagesAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
-import { formatDateTimeInTokyo, formatScheduleInTokyo } from "@/lib/datetime";
+import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -114,7 +114,7 @@ export default async function AdminSurveyDetailPage({
           <div className="detail-stack admin-meta-stack">
             <div className="detail-block">
               <p className="detail-title">開催日時</p>
-              <p>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</p>
+              <p>{formatSurveyScheduleInTokyo(survey)}</p>
             </div>
             <div className="detail-block">
               <p className="detail-title">締切</p>

@@ -509,6 +509,21 @@ h1 {
   line-height: 1.6;
 }
 
+.schedule-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.inline-choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.schedule-time-range {
+  align-content: start;
+}
+
 .selection-group {
   display: grid;
   gap: 10px;

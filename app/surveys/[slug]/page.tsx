@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { formatDateTimeInTokyo, formatScheduleInTokyo } from "@/lib/datetime";
+import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -19,6 +19,11 @@ type SurveyDetail = {
   committee: string;
   description: string;
   workDetails: string;
+  useDateRange: boolean;
+  eventStartDate: string | null;
+  eventEndDate: string | null;
+  eventStartTime: string | null;
+  eventEndTime: string | null;
   startsAt: string;
   endsAt: string;
   closeAt: string;
@@ -313,14 +318,14 @@ export default function SurveyDetailPage() {
             <article className="survey-card survey-open">
               <div className="survey-meta">
                 <span>{survey.committee}</span>
-                <span>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</span>
+                <span>{formatSurveyScheduleInTokyo(survey)}</span>
               </div>
               <h2>{survey.title}</h2>
               <p>{survey.description}</p>
               <div className="detail-stack">
                 <div className="detail-block">
                   <p className="detail-title">開催日時</p>
-                  <p>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</p>
+                  <p>{formatSurveyScheduleInTokyo(survey)}</p>
                 </div>
                 <div className="detail-block">
                   <p className="detail-title">締切日時</p>

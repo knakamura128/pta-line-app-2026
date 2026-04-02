@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { formatScheduleInTokyo } from "@/lib/datetime";
+import { formatSurveyScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -17,6 +17,11 @@ type Survey = {
   slug: string;
   title: string;
   committee: string;
+  useDateRange?: boolean;
+  eventStartDate?: string | null;
+  eventEndDate?: string | null;
+  eventStartTime?: string | null;
+  eventEndTime?: string | null;
   startsAt: string;
   endsAt: string;
   closeAt: string;
@@ -289,7 +294,7 @@ export default function Home() {
             <article className="survey-card survey-open" key={survey.id}>
               <div className="survey-meta">
                 <span>{survey.committee}</span>
-                <span>{formatScheduleInTokyo(survey.startsAt, survey.endsAt)}</span>
+                <span>{formatSurveyScheduleInTokyo(survey)}</span>
               </div>
               <h2>{survey.title}</h2>
               <p>{survey.description}</p>

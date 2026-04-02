@@ -29,6 +29,11 @@ export async function GET(request: Request) {
         slug: application.survey.slug,
         title: application.survey.title,
         committee: application.survey.committee,
+        useDateRange: application.survey.useDateRange,
+        eventStartDate: application.survey.eventStartDate,
+        eventEndDate: application.survey.eventEndDate,
+        eventStartTime: application.survey.eventStartTime,
+        eventEndTime: application.survey.eventEndTime,
         startsAt: application.survey.startsAt,
         endsAt: application.survey.endsAt,
         closeAt: application.survey.closeAt

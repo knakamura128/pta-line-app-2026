@@ -41,6 +41,11 @@ model Survey {
   selectionType SelectionInputType @default(NONE)
   selectionOptions String[] @default([])
   selectionOptionLimits Int[] @default([])
+  useDateRange Boolean      @default(false)
+  eventStartDate DateTime?
+  eventEndDate DateTime?
+  eventStartTime String?
+  eventEndTime String?
   startsAt    DateTime
   endsAt      DateTime
   closeAt     DateTime

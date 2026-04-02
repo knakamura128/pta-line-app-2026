@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
 import { updateSurveyAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
-import { formatDateTimeLocalInputInTokyo } from "@/lib/datetime";
+import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -68,27 +69,14 @@ export default async function AdminSurveyEditPage({
                 </label>
               </div>
 
-              <div className="double-fields">
-                <label className="field">
-                  <span>開始日時</span>
-                  <input
-                    defaultValue={formatDateTimeLocalInputInTokyo(survey.startsAt)}
-                    name="startsAt"
-                    required
-                    type="datetime-local"
-                  />
-                </label>
-                <label className="field">
-                  <span>終了日時</span>
-                  <input
-                    defaultValue={formatDateTimeLocalInputInTokyo(survey.endsAt)}
-                    name="endsAt"
-                    required
-                    type="datetime-local"
-                  />
-                </label>
-              </div>
-              <p className="helper-text">複数日にまたがる活動も開始日時と終了日時だけで登録できます。</p>
+              <ScheduleFieldsEditor
+                initialEndDate={survey.eventEndDate ? formatDateInputInTokyo(survey.eventEndDate) : formatDateInputInTokyo(survey.endsAt)}
+                initialEndTime={survey.eventEndTime ?? formatTimeInputInTokyo(survey.endsAt)}
+                initialStartDate={survey.eventStartDate ? formatDateInputInTokyo(survey.eventStartDate) : formatDateInputInTokyo(survey.startsAt)}
+                initialStartTime={survey.eventStartTime ?? formatTimeInputInTokyo(survey.startsAt)}
+                initialUseDateRange={survey.useDateRange}
+              />
+              <p className="helper-text">期間入力を ON にすると、複数日に同じ時間帯で開催する募集をまとめて登録できます。</p>
 
               <label className="field">
                 <span>締切日時</span>

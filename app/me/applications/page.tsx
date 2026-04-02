@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { formatDateTimeInTokyo, formatScheduleInTokyo } from "@/lib/datetime";
+import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -20,6 +20,11 @@ type MyApplication = {
     slug: string;
     title: string;
     committee: string;
+    useDateRange?: boolean;
+    eventStartDate?: string | null;
+    eventEndDate?: string | null;
+    eventStartTime?: string | null;
+    eventEndTime?: string | null;
     startsAt: string;
     endsAt: string;
     closeAt: string;
@@ -145,7 +150,7 @@ export default function MyApplicationsPage() {
             <article className="survey-card survey-open" key={application.id}>
               <div className="survey-meta">
                 <span>{application.survey.committee}</span>
-                <span>{formatScheduleInTokyo(application.survey.startsAt, application.survey.endsAt)}</span>
+                <span>{formatSurveyScheduleInTokyo(application.survey)}</span>
               </div>
               <h2>{application.survey.title}</h2>
               <p>

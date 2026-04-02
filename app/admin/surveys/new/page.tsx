@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { createSurveyAction } from "@/app/admin/surveys/actions";
+import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
-import { formatDateTimeLocalInputInTokyo } from "@/lib/datetime";
+import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -67,27 +68,26 @@ export default async function AdminSurveyNewPage({
                 </label>
               </div>
 
-              <div className="double-fields">
-                <label className="field">
-                  <span>開始日時</span>
-                  <input
-                    defaultValue={sourceSurvey ? formatDateTimeLocalInputInTokyo(sourceSurvey.startsAt) : "2026-04-10T09:00"}
-                    name="startsAt"
-                    required
-                    type="datetime-local"
-                  />
-                </label>
-                <label className="field">
-                  <span>終了日時</span>
-                  <input
-                    defaultValue={sourceSurvey ? formatDateTimeLocalInputInTokyo(sourceSurvey.endsAt) : "2026-04-10T11:00"}
-                    name="endsAt"
-                    required
-                    type="datetime-local"
-                  />
-                </label>
-              </div>
-              <p className="helper-text">日をまたぐ活動も、そのまま開始日時と終了日時を入力できます。</p>
+              <ScheduleFieldsEditor
+                initialEndDate={
+                  sourceSurvey?.eventEndDate
+                    ? formatDateInputInTokyo(sourceSurvey.eventEndDate)
+                    : sourceSurvey
+                      ? formatDateInputInTokyo(sourceSurvey.endsAt)
+                      : "2026-04-10"
+                }
+                initialEndTime={sourceSurvey?.eventEndTime ?? (sourceSurvey ? formatTimeInputInTokyo(sourceSurvey.endsAt) : "11:00")}
+                initialStartDate={
+                  sourceSurvey?.eventStartDate
+                    ? formatDateInputInTokyo(sourceSurvey.eventStartDate)
+                    : sourceSurvey
+                      ? formatDateInputInTokyo(sourceSurvey.startsAt)
+                      : "2026-04-10"
+                }
+                initialStartTime={sourceSurvey?.eventStartTime ?? (sourceSurvey ? formatTimeInputInTokyo(sourceSurvey.startsAt) : "09:00")}
+                initialUseDateRange={sourceSurvey?.useDateRange ?? false}
+              />
+              <p className="helper-text">期間入力を ON にすると、複数日に同じ時間帯で開催する募集をまとめて登録できます。</p>
 
               <label className="field">
                 <span>締切日時</span>

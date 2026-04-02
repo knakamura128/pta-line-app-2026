@@ -25,6 +25,11 @@ export async function createSurveyAction(formData: FormData) {
       selectionType: input.selectionType,
       selectionOptions: input.selectionOptions,
       selectionOptionLimits: input.selectionOptionLimits,
+      useDateRange: input.useDateRange,
+      eventStartDate: input.eventStartDate,
+      eventEndDate: input.eventEndDate,
+      eventStartTime: input.eventStartTime,
+      eventEndTime: input.eventEndTime,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       closeAt: input.closeAt,
@@ -59,6 +64,11 @@ export async function updateSurveyAction(formData: FormData) {
       selectionType: input.selectionType,
       selectionOptions: input.selectionOptions,
       selectionOptionLimits: input.selectionOptionLimits,
+      useDateRange: input.useDateRange,
+      eventStartDate: input.eventStartDate,
+      eventEndDate: input.eventEndDate,
+      eventStartTime: input.eventStartTime,
+      eventEndTime: input.eventEndTime,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       closeAt: input.closeAt,
@@ -170,8 +180,11 @@ function parseSurveyFormData(formData: FormData) {
   const selectionType = readSelectionType(formData);
   const selectionOptionLabels = formData.getAll("selectionOptionLabel").map((value) => (typeof value === "string" ? value : ""));
   const selectionOptionLimits = formData.getAll("selectionOptionLimit").map((value) => (typeof value === "string" ? value : ""));
-  const startsAtValue = readRequiredString(formData, "startsAt");
-  const endsAtValue = readRequiredString(formData, "endsAt");
+  const useDateRange = readString(formData, "useDateRange") === "true";
+  const startDate = readRequiredString(formData, "startDate");
+  const endDate = readRequiredString(formData, "endDate");
+  const startTime = readRequiredString(formData, "startTime");
+  const endTime = readRequiredString(formData, "endTime");
   const closeAt = readRequiredString(formData, "closeAt");
   const capacityValue = Number(readRequiredString(formData, "capacity"));
 
@@ -179,12 +192,16 @@ function parseSurveyFormData(formData: FormData) {
     throw new Error("募集人数は1以上の整数で入力してください。");
   }
 
-  const startsAt = new Date(`${startsAtValue}:00+09:00`);
-  const endsAt = new Date(`${endsAtValue}:00+09:00`);
+  const startsAt = new Date(`${startDate}T${startTime}:00+09:00`);
+  const endsAt = new Date(`${endDate}T${endTime}:00+09:00`);
   const closeAtDate = new Date(`${closeAt}:00+09:00`);
 
   if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()) || Number.isNaN(closeAtDate.getTime())) {
     throw new Error("日時の形式が不正です。");
+  }
+
+  if (useDateRange && startDate > endDate) {
+    throw new Error("終了日は開始日以降にしてください。");
   }
 
   if (startsAt >= endsAt) {
@@ -208,6 +225,11 @@ function parseSurveyFormData(formData: FormData) {
     selectionType: selectionConfig.selectionType,
     selectionOptions: selectionConfig.selectionOptions,
     selectionOptionLimits: selectionConfig.selectionOptionLimits,
+    useDateRange,
+    eventStartDate: new Date(`${startDate}T00:00:00+09:00`),
+    eventEndDate: new Date(`${endDate}T00:00:00+09:00`),
+    eventStartTime: startTime,
+    eventEndTime: endTime,
     startsAt,
     endsAt,
     closeAt: closeAtDate,
