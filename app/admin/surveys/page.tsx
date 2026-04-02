@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SurveyActionButtons } from "@/app/admin/surveys/survey-action-buttons";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
 
@@ -61,19 +62,11 @@ export default async function AdminSurveysPage({
                 {survey._count.applications} / {survey.capacity}
               </span>
               <span>{formatDateTime(survey.closeAt)}</span>
-              <div className="table-actions">
-                <Link className="text-link" href={`/admin/surveys/edit?id=${survey.id}`}>
-                  編集
-                </Link>
-                <Link className="text-link" href={`/admin/surveys/new?copyFrom=${survey.slug}`}>
-                  コピー新規
-                </Link>
-                {survey.status !== "DRAFT" ? (
-                  <Link className="text-link" href={`/admin/surveys/${survey.slug}`}>
-                    回答一覧
-                  </Link>
-                ) : null}
-              </div>
+              <SurveyActionButtons
+                isDraft={survey.status === "DRAFT"}
+                surveyId={survey.id}
+                surveySlug={survey.slug}
+              />
             </div>
           ))}
         </div>
@@ -81,8 +74,14 @@ export default async function AdminSurveysPage({
       {saved ? (
         <aside className="apply-panel">
           <div className="inline-notice">
-            <strong>{saved === "published" ? "公開を反映しました。" : "下書きを保存しました。"}</strong>
-            <span>次は一覧から編集、コピー新規、回答一覧の確認ができます。</span>
+            <strong>
+              {saved === "published"
+                ? "公開を反映しました。"
+                : saved === "deleted"
+                  ? "募集を削除しました。"
+                  : "下書きを保存しました。"}
+            </strong>
+            <span>次は一覧から編集、複製、回答確認を行えます。</span>
           </div>
         </aside>
       ) : null}

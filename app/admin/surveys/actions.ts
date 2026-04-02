@@ -132,6 +132,33 @@ export async function sendConfirmationMessagesAction(formData: FormData) {
   redirect(`/admin/surveys/${survey.slug}?confirmationSent=${sentCount}&confirmationFailed=${failedCount}`);
 }
 
+export async function deleteSurveyAction(formData: FormData) {
+  const surveyId = readString(formData, "surveyId");
+
+  if (!surveyId) {
+    throw new Error("募集IDが不足しています。");
+  }
+
+  const survey = await prisma.survey.findUnique({
+    where: {
+      id: surveyId
+    }
+  });
+
+  if (!survey) {
+    throw new Error("募集が見つかりません。");
+  }
+
+  await prisma.survey.delete({
+    where: {
+      id: surveyId
+    }
+  });
+
+  revalidateAdminPaths(survey.slug);
+  redirect("/admin/surveys?saved=deleted");
+}
+
 function parseSurveyFormData(formData: FormData) {
   const mode = readMode(formData);
   const title = readRequiredString(formData, "title");
