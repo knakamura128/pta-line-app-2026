@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
-import { updateSurveyAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
@@ -45,7 +44,7 @@ export default async function AdminSurveyEditPage({
         </div>
 
         <div className="table-card">
-          <form action={updateSurveyAction}>
+          <form action="/api/admin/surveys" method="post">
             <input name="surveyId" type="hidden" value={survey.id} />
             <div className="form-layout">
               <label className="field">

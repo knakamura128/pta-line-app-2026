@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { updateSurveyAction } from "@/app/admin/surveys/actions";
 import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
@@ -58,7 +57,7 @@ export default async function AdminSurveyEditPage({
               <span>{error}</span>
             </div>
           ) : null}
-          <form action={updateSurveyAction}>
+          <form action="/api/admin/surveys" method="post">
             <input name="surveyId" type="hidden" value={survey.id} />
             <div className="form-layout">
               <label className="field">

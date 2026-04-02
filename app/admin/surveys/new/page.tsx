@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { createSurveyAction } from "@/app/admin/surveys/actions";
 import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
@@ -51,7 +50,7 @@ export default async function AdminSurveyNewPage({
               <span>{error}</span>
             </div>
           ) : null}
-          <form action={createSurveyAction}>
+          <form action="/api/admin/surveys" method="post">
             <div className="form-layout">
               <label className="field">
                 <span>募集タイトル</span>
