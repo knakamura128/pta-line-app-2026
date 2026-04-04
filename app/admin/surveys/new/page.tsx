@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
 import { SelectionOptionsEditor } from "@/app/admin/surveys/selection-options-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { COMMITTEE_OPTIONS, DEFAULT_COMMITTEE } from "@/lib/committee-options";
 import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
@@ -60,11 +61,12 @@ export default async function AdminSurveyNewPage({
               <div className="double-fields">
                 <label className="field">
                   <span>担当区分</span>
-                  <select defaultValue={sourceSurvey?.committee ?? "校外委員会"} name="committee" required>
-                    <option value="校外委員会">校外委員会</option>
-                    <option value="図書委員会">図書委員会</option>
-                    <option value="本部役員">本部役員</option>
-                    <option value="運営スタッフ">運営スタッフ</option>
+                  <select defaultValue={sourceSurvey?.committee ?? DEFAULT_COMMITTEE} name="committee" required>
+                    {COMMITTEE_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 <label className="field">

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ScheduleFieldsEditor } from "@/app/admin/surveys/schedule-fields-editor";
 import { ensureSeedData } from "@/lib/bootstrap";
+import { COMMITTEE_OPTIONS } from "@/lib/committee-options";
 import { formatDateInputInTokyo, formatDateTimeLocalInputInTokyo, formatTimeInputInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 
@@ -56,10 +57,11 @@ export default async function AdminSurveyEditPage({
                 <label className="field">
                   <span>担当区分</span>
                   <select defaultValue={survey.committee} name="committee" required>
-                    <option value="校外委員会">校外委員会</option>
-                    <option value="図書委員会">図書委員会</option>
-                    <option value="本部役員">本部役員</option>
-                    <option value="運営スタッフ">運営スタッフ</option>
+                    {COMMITTEE_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 <label className="field">
