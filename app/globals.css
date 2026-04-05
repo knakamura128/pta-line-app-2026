@@ -124,6 +124,74 @@ button {
   margin-bottom: 24px;
 }
 
+.guide-panel {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-xl);
+  padding: 20px 22px;
+  backdrop-filter: blur(18px);
+  margin-bottom: 24px;
+}
+
+.guide-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.guide-panel-caption {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.guide-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.guide-chip {
+  display: grid;
+  gap: 8px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 16px;
+  position: relative;
+}
+
+.guide-chip strong {
+  font-size: 15px;
+}
+
+.guide-chip p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.guide-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: white;
+  font-weight: 800;
+  font-size: 13px;
+}
+
 .survey-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
@@ -892,6 +960,10 @@ input[type="checkbox"] {
     grid-template-columns: 1fr;
   }
 
+  .guide-chip-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .panel-notes {
     order: 3;
   }
@@ -910,6 +982,19 @@ input[type="checkbox"] {
 @media (max-width: 760px) {
   .page-shell {
     padding: 20px 14px 32px;
+  }
+
+  .guide-panel {
+    padding: 18px;
+  }
+
+  .guide-panel-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .guide-chip-grid {
+    grid-template-columns: 1fr;
   }
 
   .hero {

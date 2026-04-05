@@ -291,6 +291,38 @@ export default function Home() {
 
       {liffError ? <div className="alert-box error-text">{liffError}</div> : null}
 
+      <section className="guide-panel" aria-label="使い方ガイド">
+        <div className="guide-panel-head">
+          <div>
+            <p className="top-label">Guide</p>
+            <h3>使い方ガイド</h3>
+          </div>
+          <span className="guide-panel-caption">はじめて使う方向け</span>
+        </div>
+        <div className="guide-chip-grid">
+          <article className="guide-chip">
+            <span className="guide-step">1</span>
+            <strong>募集を選ぶ</strong>
+            <p>一覧から参加したい活動を確認します。</p>
+          </article>
+          <article className="guide-chip">
+            <span className="guide-step">2</span>
+            <strong>応募する</strong>
+            <p>応募時にLINE認証を行い、必要事項を入力します。</p>
+          </article>
+          <article className="guide-chip">
+            <span className="guide-step">3</span>
+            <strong>内容を確認する</strong>
+            <p>自分の回答一覧から応募内容の確認や編集ができます。</p>
+          </article>
+          <article className="guide-chip">
+            <span className="guide-step">4</span>
+            <strong>必要なら取り消す</strong>
+            <p>締切前であれば応募済みの活動を取り消せます。</p>
+          </article>
+        </div>
+      </section>
+
       <main className="survey-grid">
         <section className="survey-column">
           {surveysLoading ? <div className="detail-block">募集を読み込み中です。</div> : null}

@@ -83,6 +83,38 @@ export default async function AdminPage() {
           </div>
         </div>
 
+        <section className="guide-panel" aria-label="管理者向けガイド">
+          <div className="guide-panel-head">
+            <div>
+              <p className="top-label">Guide</p>
+              <h4>管理画面の流れ</h4>
+            </div>
+            <span className="guide-panel-caption">日々の運用用</span>
+          </div>
+          <div className="guide-chip-grid admin-guide-grid">
+            <article className="guide-chip">
+              <span className="guide-step">1</span>
+              <strong>募集を作成</strong>
+              <p>新規募集から内容を入力し、下書きまたは公開します。</p>
+            </article>
+            <article className="guide-chip">
+              <span className="guide-step">2</span>
+              <strong>回答を確認</strong>
+              <p>募集一覧や回答一覧から応募状況を確認します。</p>
+            </article>
+            <article className="guide-chip">
+              <span className="guide-step">3</span>
+              <strong>当日確認</strong>
+              <p>回答者一覧の確認済みチェックで来場状況を管理します。</p>
+            </article>
+            <article className="guide-chip">
+              <span className="guide-step">4</span>
+              <strong>確定通知を送信</strong>
+              <p>募集詳細から先着順の対象者へ確定通知を送ります。</p>
+            </article>
+          </div>
+        </section>
+
         <div className="table-card">
           <div className="section-title-row">
             <h4>公開中の募集</h4>
