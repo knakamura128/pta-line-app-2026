@@ -90,6 +90,12 @@ button {
   text-decoration: none;
 }
 
+.field-error {
+  color: #b42318;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
 .text-button {
   text-decoration: none;
   display: inline-flex;
@@ -594,6 +600,32 @@ input[type="checkbox"] {
   margin: 0;
   padding: 0;
   accent-color: var(--ink);
+}
+
+.attendance-control {
+  display: grid;
+  gap: 6px;
+}
+
+.attendance-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  width: fit-content;
+}
+
+.attendance-checkbox.is-checked {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.attendance-checkbox.is-pending {
+  opacity: 0.7;
 }
 
 .success-panel {

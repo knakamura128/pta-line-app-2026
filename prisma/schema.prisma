@@ -65,6 +65,7 @@ model Application {
   displayName String
   childGrade  String
   childClass  String
+  attendanceChecked Boolean @default(false)
   selectionAnswers String[] @default([])
   note        String?
   createdAt   DateTime @default(now())

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { AttendanceCheckbox } from "@/app/admin/surveys/attendance-checkbox";
 import { sendConfirmationMessagesAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
@@ -139,13 +140,16 @@ export default async function AdminSurveyDetailByIdPage({
         <div className="table-card">
           <div className="section-title-row">
             <h4>回答者一覧</h4>
-            <span>先着 {survey.capacity} 名が通知対象</span>
+            <span>
+              先着 {survey.capacity} 名が通知対象 / 当日確認済み {survey.applications.filter((item) => item.attendanceChecked).length} 名
+            </span>
           </div>
           <div className="table-head answers">
             <span>回答者</span>
             <span>回答日時</span>
             <span>状態</span>
             <span>回答内容</span>
+            <span>当日確認</span>
           </div>
           {survey.applications.map((application, index) => (
             <div className="table-row answers" key={application.id}>
@@ -172,6 +176,9 @@ export default async function AdminSurveyDetailByIdPage({
                     ? application.selectionAnswers.join(" / ")
                     : application.note || "-"}
                 </span>
+              </div>
+              <div className="mobile-table-cell" data-label="当日確認">
+                <AttendanceCheckbox applicationId={application.id} initialChecked={application.attendanceChecked} />
               </div>
             </div>
           ))}
