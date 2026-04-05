@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { sendConfirmationMessagesAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
@@ -252,7 +251,7 @@ export default async function AdminSurveyDetailPage({
             <p className="detail-title">確定通知</p>
             <p>送信成功ログ: {confirmationLogCount} 件</p>
           </div>
-          <form action={sendConfirmationMessagesAction}>
+          <form action="/api/admin/surveys/confirm" method="post">
             <input name="surveyId" type="hidden" value={survey.id} />
             <button className="primary-button wide" type="submit">
               先着 {Math.min(survey.capacity, survey.applications.length)} 名へ確定通知を送る

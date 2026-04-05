@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { deleteSurveyAction } from "@/app/admin/surveys/actions";
 
 export function SurveyActionButtons({
   surveyId,
@@ -28,7 +27,8 @@ export function SurveyActionButtons({
         <span className="action-hint">下書き中は回答なし</span>
       )}
       <form
-        action={deleteSurveyAction}
+        action="/api/admin/surveys/delete"
+        method="post"
         onSubmit={(event) => {
           if (!window.confirm("この募集を削除します。応募データと送信ログも削除されます。よろしいですか？")) {
             event.preventDefault();
