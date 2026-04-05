@@ -150,6 +150,25 @@ button {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.admin-login-card {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 18px;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  backdrop-filter: blur(18px);
 }
 
 .hero,

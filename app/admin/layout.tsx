@@ -29,6 +29,11 @@ export default function AdminLayout({
           <Link className="text-link" href="/">
             利用者画面
           </Link>
+          <form action="/api/admin/logout" method="post">
+            <button className="ghost-button small" type="submit">
+              ログアウト
+            </button>
+          </form>
         </nav>
       </header>
       {children}

@@ -1,61 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ADMIN_SESSION_COOKIE, isAdminAuthConfigured, isValidAdminSession } from "@/lib/admin-auth";
 
 const ADMIN_PATH_PREFIX = "/admin";
+const ADMIN_LOGIN_PATH = "/admin/login";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isAdminPage = pathname.startsWith(ADMIN_PATH_PREFIX);
+  const isAdminApi = pathname.startsWith("/api/admin");
 
-  if (!pathname.startsWith(ADMIN_PATH_PREFIX)) {
+  if (!isAdminPage && !isAdminApi) {
     return NextResponse.next();
   }
 
-  const adminUser = process.env.ADMIN_BASIC_USER;
-  const adminPass = process.env.ADMIN_BASIC_PASS;
-
-  if (!adminUser || !adminPass) {
-    return new NextResponse("Basic auth is not configured.", { status: 500 });
+  if (!isAdminAuthConfigured()) {
+    return new NextResponse("Admin auth is not configured.", { status: 500 });
   }
 
-  const authorization = request.headers.get("authorization");
-
-  if (!authorization?.startsWith("Basic ")) {
-    return unauthorized();
+  if (pathname === ADMIN_LOGIN_PATH) {
+    return NextResponse.next();
   }
 
-  const encoded = authorization.split(" ")[1] ?? "";
-  const decoded = safeDecodeBase64(encoded);
+  const session = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
 
-  if (!decoded) {
-    return unauthorized();
+  if (isValidAdminSession(session)) {
+    return NextResponse.next();
   }
 
-  const [user, ...passwordParts] = decoded.split(":");
-  const pass = passwordParts.join(":");
-
-  if (user !== adminUser || pass !== adminPass) {
-    return unauthorized();
+  if (isAdminApi) {
+    return NextResponse.json({ message: "Authentication required." }, { status: 401 });
   }
 
-  return NextResponse.next();
+  const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
+  loginUrl.searchParams.set("next", pathname);
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"]
 };
-
-function unauthorized() {
-  return new NextResponse("Authentication required.", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="PTA Admin", charset="UTF-8"'
-    }
-  });
-}
-
-function safeDecodeBase64(value: string) {
-  try {
-    return atob(value);
-  } catch {
-    return null;
-  }
-}
