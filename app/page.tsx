@@ -370,7 +370,7 @@ export default function Home() {
               </article>
             </div>
             <div className="hero-inline">
-              <Link className="text-link" href="/guide#public">
+              <Link className="text-link" href="/guide?mode=public#public">
                 詳しいガイドページを見る
               </Link>
             </div>

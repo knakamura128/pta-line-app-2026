@@ -125,7 +125,17 @@ const adminModules = [
   }
 ];
 
-export default function GuidePage() {
+type GuideMode = "public" | "admin";
+
+export default async function GuidePage({
+  searchParams
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const { mode } = await searchParams;
+  const guideMode: GuideMode = mode === "admin" ? "admin" : "public";
+  const visibleModules = guideMode === "admin" ? adminModules : publicModules;
+
   return (
     <div className="landing-shell">
       <header className="landing-hero">
@@ -133,128 +143,136 @@ export default function GuidePage() {
           <p className="eyebrow">PTA Guide</p>
           <h1>使い方ガイド</h1>
           <p className="hero-copy">
-            利用者向け画面と管理者向け画面の使い方を、スクリーンショット風のガイドでまとめています。
+            {guideMode === "admin"
+              ? "管理者向け画面の使い方を、スクリーンショット風のガイドでまとめています。"
+              : "利用者向け画面の使い方を、スクリーンショット風のガイドでまとめています。"}
           </p>
           <div className="hero-inline">
             <Link className="ghost-button small" href="/">
               活動募集一覧へ
             </Link>
-            <Link className="ghost-button small" href="/admin">
-              管理者画面へ
-            </Link>
+            {guideMode === "admin" ? (
+              <Link className="ghost-button small" href="/admin">
+                管理者画面へ
+              </Link>
+            ) : null}
           </div>
         </div>
         <div className="summary-card">
           <span>ガイド収録</span>
-          <strong>{publicModules.length + adminModules.length}画面</strong>
-          <p>公開側と管理側の主要モジュールをまとめています。</p>
+          <strong>{visibleModules.length}画面</strong>
+          <p>{guideMode === "admin" ? "管理者向けの主要モジュールをまとめています。" : "利用者向けの主要モジュールをまとめています。"}</p>
         </div>
       </header>
 
       <main className="guide-page-grid">
-        <section className="guide-section" id="public">
-          <div className="guide-section-head">
-            <div>
-              <p className="top-label">Public</p>
-              <h2>利用者向けガイド</h2>
+        {guideMode === "public" ? (
+          <section className="guide-section" id="public">
+            <div className="guide-section-head">
+              <div>
+                <p className="top-label">Public</p>
+                <h2>利用者向けガイド</h2>
+              </div>
+              <Link className="text-link" href="/">
+                公開画面を開く
+              </Link>
             </div>
-            <Link className="text-link" href="/">
-              公開画面を開く
-            </Link>
-          </div>
-          <div className="guide-module-list">
-            {publicModules.map((module) => (
-              <article className="guide-module-card" id={module.id} key={module.id}>
-                <div className="guide-shot">
-                  <div className="guide-shot-bar">
-                    <span />
-                    <span />
-                    <span />
+            <div className="guide-module-list">
+              {publicModules.map((module) => (
+                <article className="guide-module-card" id={module.id} key={module.id}>
+                  <div className="guide-shot">
+                    <div className="guide-shot-bar">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <div className="guide-shot-body">
+                      <p className="top-label">{module.preview.kicker}</p>
+                      <h3>{module.preview.heading}</h3>
+                      <p className="guide-shot-meta">{module.preview.meta}</p>
+                      <p className="guide-shot-copy">{module.preview.body}</p>
+                      <div className="guide-shot-chip-row">
+                        {module.preview.chips.map((chip) => (
+                          <span className="guide-shot-chip" key={chip}>
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div className="guide-shot-body">
-                    <p className="top-label">{module.preview.kicker}</p>
-                    <h3>{module.preview.heading}</h3>
-                    <p className="guide-shot-meta">{module.preview.meta}</p>
-                    <p className="guide-shot-copy">{module.preview.body}</p>
-                    <div className="guide-shot-chip-row">
-                      {module.preview.chips.map((chip) => (
-                        <span className="guide-shot-chip" key={chip}>
-                          {chip}
-                        </span>
+                  <div className="guide-module-copy">
+                    <div className="guide-module-head">
+                      <span className="guide-step">{module.step}</span>
+                      <div>
+                        <p className="top-label">Module</p>
+                        <h3>{module.title}</h3>
+                      </div>
+                    </div>
+                    <ul className="guide-bullet-list">
+                      {module.points.map((point) => (
+                        <li key={point}>{point}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
-                </div>
-                <div className="guide-module-copy">
-                  <div className="guide-module-head">
-                    <span className="guide-step">{module.step}</span>
-                    <div>
-                      <p className="top-label">Module</p>
-                      <h3>{module.title}</h3>
-                    </div>
-                  </div>
-                  <ul className="guide-bullet-list">
-                    {module.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
-        <section className="guide-section" id="admin">
-          <div className="guide-section-head">
-            <div>
-              <p className="top-label">Admin</p>
-              <h2>管理者向けガイド</h2>
+        {guideMode === "admin" ? (
+          <section className="guide-section" id="admin">
+            <div className="guide-section-head">
+              <div>
+                <p className="top-label">Admin</p>
+                <h2>管理者向けガイド</h2>
+              </div>
+              <Link className="text-link" href="/admin">
+                管理画面を開く
+              </Link>
             </div>
-            <Link className="text-link" href="/admin">
-              管理画面を開く
-            </Link>
-          </div>
-          <div className="guide-module-list">
-            {adminModules.map((module) => (
-              <article className="guide-module-card" id={module.id} key={module.id}>
-                <div className="guide-shot guide-shot-admin">
-                  <div className="guide-shot-bar">
-                    <span />
-                    <span />
-                    <span />
+            <div className="guide-module-list">
+              {adminModules.map((module) => (
+                <article className="guide-module-card" id={module.id} key={module.id}>
+                  <div className="guide-shot guide-shot-admin">
+                    <div className="guide-shot-bar">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <div className="guide-shot-body">
+                      <p className="top-label">{module.preview.kicker}</p>
+                      <h3>{module.preview.heading}</h3>
+                      <p className="guide-shot-meta">{module.preview.meta}</p>
+                      <p className="guide-shot-copy">{module.preview.body}</p>
+                      <div className="guide-shot-chip-row">
+                        {module.preview.chips.map((chip) => (
+                          <span className="guide-shot-chip" key={chip}>
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div className="guide-shot-body">
-                    <p className="top-label">{module.preview.kicker}</p>
-                    <h3>{module.preview.heading}</h3>
-                    <p className="guide-shot-meta">{module.preview.meta}</p>
-                    <p className="guide-shot-copy">{module.preview.body}</p>
-                    <div className="guide-shot-chip-row">
-                      {module.preview.chips.map((chip) => (
-                        <span className="guide-shot-chip" key={chip}>
-                          {chip}
-                        </span>
+                  <div className="guide-module-copy">
+                    <div className="guide-module-head">
+                      <span className="guide-step">{module.step}</span>
+                      <div>
+                        <p className="top-label">Module</p>
+                        <h3>{module.title}</h3>
+                      </div>
+                    </div>
+                    <ul className="guide-bullet-list">
+                      {module.points.map((point) => (
+                        <li key={point}>{point}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
-                </div>
-                <div className="guide-module-copy">
-                  <div className="guide-module-head">
-                    <span className="guide-step">{module.step}</span>
-                    <div>
-                      <p className="top-label">Module</p>
-                      <h3>{module.title}</h3>
-                    </div>
-                  </div>
-                  <ul className="guide-bullet-list">
-                    {module.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </main>
     </div>
   );

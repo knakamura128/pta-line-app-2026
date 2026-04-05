@@ -26,7 +26,7 @@ export default function AdminLayout({
           <Link className="text-link" href="/admin/applications">
             回答一覧
           </Link>
-          <Link className="text-link" href="/guide#admin">
+          <Link className="text-link" href="/guide?mode=admin#admin">
             使い方ガイド
           </Link>
           <Link className="text-link" href="/">
