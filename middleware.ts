@@ -3,6 +3,7 @@ import { ADMIN_SESSION_COOKIE, isAdminAuthConfigured, isValidAdminSession } from
 
 const ADMIN_PATH_PREFIX = "/admin";
 const ADMIN_LOGIN_PATH = "/admin/login";
+const ADMIN_LOGIN_API_PATH = "/api/admin/login";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -17,7 +18,7 @@ export function middleware(request: NextRequest) {
     return new NextResponse("Admin auth is not configured.", { status: 500 });
   }
 
-  if (pathname === ADMIN_LOGIN_PATH) {
+  if (pathname === ADMIN_LOGIN_PATH || pathname === ADMIN_LOGIN_API_PATH) {
     return NextResponse.next();
   }
 
