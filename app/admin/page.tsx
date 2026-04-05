@@ -95,22 +95,34 @@ export default async function AdminPage() {
             <article className="guide-chip">
               <span className="guide-step">1</span>
               <strong>募集を作成</strong>
-              <p>新規募集から内容を入力し、下書きまたは公開します。</p>
+              <p>
+                「新規募集」から募集名、担当区分、開催日時、募集人数、確定通知文面などを入力します。
+                内容を確認しながら、まずは下書き保存し、準備が整ったら公開します。
+              </p>
             </article>
             <article className="guide-chip">
               <span className="guide-step">2</span>
               <strong>回答を確認</strong>
-              <p>募集一覧や回答一覧から応募状況を確認します。</p>
+              <p>
+                募集一覧や回答一覧から、どの募集に何人応募しているかを確認します。
+                学年別や選択肢別の状況も見ながら、募集人数に達しているかを判断します。
+              </p>
             </article>
             <article className="guide-chip">
               <span className="guide-step">3</span>
               <strong>当日確認</strong>
-              <p>回答者一覧の確認済みチェックで来場状況を管理します。</p>
+              <p>
+                募集詳細の回答者一覧では、来場した方に「確認済み」チェックを付けます。
+                チェックが付いていない人は未確認の状態として、その日の参加状況を管理できます。
+              </p>
             </article>
             <article className="guide-chip">
               <span className="guide-step">4</span>
               <strong>確定通知を送信</strong>
-              <p>募集詳細から先着順の対象者へ確定通知を送ります。</p>
+              <p>
+                募集詳細画面のボタンから、先着順で対象者へ確定通知を送信します。
+                送信後は送信ログを見て、成功件数と失敗理由を確認できます。
+              </p>
             </article>
           </div>
         </section>
