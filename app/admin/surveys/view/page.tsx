@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { sendConfirmationMessagesAction } from "@/app/admin/surveys/actions";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
@@ -16,7 +16,7 @@ export default async function AdminSurveyDetailByIdPage({
   const { id, saved, confirmationSent, confirmationFailed } = await searchParams;
 
   if (!id) {
-    notFound();
+    redirect("/admin/surveys");
   }
 
   const survey = await prisma.survey.findUnique({
