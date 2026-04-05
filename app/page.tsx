@@ -44,6 +44,7 @@ type ErrorPayload = {
 
 export default function Home() {
   const router = useRouter();
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isLineAuthed, setIsLineAuthed] = useState(false);
   const [lineProfile, setLineProfile] = useState<LineProfile | null>(null);
   const [liffStatus, setLiffStatus] = useState<LiffStatus>("idle");
@@ -280,6 +281,9 @@ export default function Home() {
             <Link className="text-link" href="/me/applications">
               自分の回答一覧
             </Link>
+            <button className="ghost-button small" onClick={() => setIsGuideOpen(true)} type="button">
+              使い方ガイド
+            </button>
           </div>
         </div>
         <div className="summary-card">
@@ -290,38 +294,6 @@ export default function Home() {
       </header>
 
       {liffError ? <div className="alert-box error-text">{liffError}</div> : null}
-
-      <section className="guide-panel" aria-label="使い方ガイド">
-        <div className="guide-panel-head">
-          <div>
-            <p className="top-label">Guide</p>
-            <h3>使い方ガイド</h3>
-          </div>
-          <span className="guide-panel-caption">はじめて使う方向け</span>
-        </div>
-        <div className="guide-chip-grid">
-          <article className="guide-chip">
-            <span className="guide-step">1</span>
-            <strong>募集を選ぶ</strong>
-            <p>一覧から参加したい活動を確認します。</p>
-          </article>
-          <article className="guide-chip">
-            <span className="guide-step">2</span>
-            <strong>応募する</strong>
-            <p>応募時にLINE認証を行い、必要事項を入力します。</p>
-          </article>
-          <article className="guide-chip">
-            <span className="guide-step">3</span>
-            <strong>内容を確認する</strong>
-            <p>自分の回答一覧から応募内容の確認や編集ができます。</p>
-          </article>
-          <article className="guide-chip">
-            <span className="guide-step">4</span>
-            <strong>必要なら取り消す</strong>
-            <p>締切前であれば応募済みの活動を取り消せます。</p>
-          </article>
-        </div>
-      </section>
 
       <main className="survey-grid">
         <section className="survey-column">
@@ -357,6 +329,54 @@ export default function Home() {
           ))}
         </section>
       </main>
+
+      {isGuideOpen ? (
+        <div className="guide-modal-backdrop" onClick={() => setIsGuideOpen(false)} role="presentation">
+          <div
+            aria-label="活動募集一覧の使い方ガイド"
+            className="guide-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+          >
+            <div className="guide-panel-head">
+              <div>
+                <p className="top-label">Guide</p>
+                <h3>使い方ガイド</h3>
+              </div>
+              <button className="ghost-button small" onClick={() => setIsGuideOpen(false)} type="button">
+                閉じる
+              </button>
+            </div>
+            <div className="guide-chip-grid">
+              <article className="guide-chip">
+                <span className="guide-step">1</span>
+                <strong>募集を選ぶ</strong>
+                <p>一覧から参加したい活動を確認します。</p>
+              </article>
+              <article className="guide-chip">
+                <span className="guide-step">2</span>
+                <strong>応募する</strong>
+                <p>応募時にLINE認証を行い、必要事項を入力します。</p>
+              </article>
+              <article className="guide-chip">
+                <span className="guide-step">3</span>
+                <strong>内容を確認する</strong>
+                <p>自分の回答一覧から応募内容の確認や編集ができます。</p>
+              </article>
+              <article className="guide-chip">
+                <span className="guide-step">4</span>
+                <strong>必要なら取り消す</strong>
+                <p>締切前であれば応募済みの活動を取り消せます。</p>
+              </article>
+            </div>
+            <div className="hero-inline">
+              <Link className="text-link" href="/guide#public">
+                詳しいガイドページを見る
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
