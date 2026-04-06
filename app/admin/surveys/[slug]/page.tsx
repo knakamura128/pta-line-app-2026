@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { LinkifiedText } from "@/app/components/linkified-text";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
@@ -108,7 +109,9 @@ export default async function AdminSurveyDetailPage({
                 {survey.applications.length} / {survey.capacity} 名
               </span>
             </div>
-            <p>{survey.description}</p>
+            <p>
+              <LinkifiedText text={survey.description} />
+            </p>
           </div>
           <div className="detail-stack admin-meta-stack">
             <div className="detail-block">
@@ -127,7 +130,9 @@ export default async function AdminSurveyDetailPage({
             ) : null}
             <div className="detail-block">
               <p className="detail-title">お仕事内容</p>
-              <p>{survey.workDetails}</p>
+              <p>
+                <LinkifiedText text={survey.workDetails} />
+              </p>
             </div>
           </div>
         </div>

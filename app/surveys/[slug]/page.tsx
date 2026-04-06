@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LinkifiedText } from "@/app/components/linkified-text";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
@@ -321,7 +322,9 @@ export default function SurveyDetailPage() {
                 <span>{formatSurveyScheduleInTokyo(survey)}</span>
               </div>
               <h2>{survey.title}</h2>
-              <p>{survey.description}</p>
+              <p>
+                <LinkifiedText text={survey.description} />
+              </p>
               <div className="detail-stack">
                 <div className="detail-block">
                   <p className="detail-title">開催日時</p>
@@ -333,7 +336,9 @@ export default function SurveyDetailPage() {
                 </div>
                 <div className="detail-block">
                   <p className="detail-title">お仕事内容</p>
-                  <p>{survey.workDetails}</p>
+                  <p>
+                    <LinkifiedText text={survey.workDetails} />
+                  </p>
                 </div>
                 <div className="detail-block">
                   <p className="detail-title">学年別集計</p>

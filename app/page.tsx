@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LinkifiedText } from "@/app/components/linkified-text";
 import { formatSurveyScheduleInTokyo } from "@/lib/datetime";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
@@ -305,7 +306,9 @@ export default function Home() {
                 <span>{`開催期間：${formatSurveyScheduleInTokyo(survey)}`}</span>
               </div>
               <h2>{survey.title}</h2>
-              <p>{survey.description}</p>
+              <p>
+                <LinkifiedText text={survey.description} />
+              </p>
               <div className="capacity-row">
                 <span>
                   現在 {survey.currentApplications} / {survey.capacity} 名

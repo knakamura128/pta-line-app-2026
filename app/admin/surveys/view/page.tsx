@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AttendanceCheckbox } from "@/app/admin/surveys/attendance-checkbox";
+import { LinkifiedText } from "@/app/components/linkified-text";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
@@ -96,7 +97,9 @@ export default async function AdminSurveyDetailByIdPage({
                 {survey.applications.length} / {survey.capacity} 名
               </span>
             </div>
-            <p>{survey.description}</p>
+            <p>
+              <LinkifiedText text={survey.description} />
+            </p>
           </div>
           <div className="detail-stack admin-meta-stack">
             <div className="detail-block">
@@ -115,7 +118,9 @@ export default async function AdminSurveyDetailByIdPage({
             ) : null}
             <div className="detail-block">
               <p className="detail-title">お仕事内容</p>
-              <p>{survey.workDetails}</p>
+              <p>
+                <LinkifiedText text={survey.workDetails} />
+              </p>
             </div>
           </div>
         </div>
