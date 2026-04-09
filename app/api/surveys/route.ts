@@ -3,8 +3,10 @@ import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
 import { getSurveyStatusLabel, isSurveyClosed } from "@/lib/survey-status";
 
-export async function GET() {
+export async function GET(request: Request) {
   await ensureSeedData();
+  const { searchParams } = new URL(request.url);
+  const scope = searchParams.get("scope");
 
   const surveys = await prisma.survey.findMany({
     where: {
@@ -23,7 +25,9 @@ export async function GET() {
   });
 
   return NextResponse.json(
-    surveys.map((survey) => ({
+    surveys
+      .filter((survey) => (scope === "closed" ? isSurveyClosed(survey.closeAt) : !isSurveyClosed(survey.closeAt)))
+      .map((survey) => ({
       id: survey.id,
       slug: survey.slug,
       title: survey.title,
@@ -48,6 +52,6 @@ export async function GET() {
         currentApplications: survey._count.applications,
         capacity: survey.capacity
       })
-    }))
+      }))
   );
 }

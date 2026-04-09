@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatDateTimeInTokyo, formatSurveyScheduleInTokyo } from "@/lib/datetime";
+import { isSurveyClosed } from "@/lib/survey-status";
 
 type LiffStatus = "idle" | "loading" | "ready" | "error" | "missing_config";
 
@@ -162,9 +163,13 @@ export default function MyApplicationsPage() {
               </p>
               <div className="capacity-row">
                 <span>締切 {formatDateTimeInTokyo(application.survey.closeAt)}</span>
-                <Link className="primary-button text-button" href={`/surveys/${application.survey.slug}`}>
-                  応募済み / 編集する
-                </Link>
+                {isSurveyClosed(application.survey.closeAt) ? (
+                  <span className="tag closed">締切済み</span>
+                ) : (
+                  <Link className="primary-button text-button" href={`/surveys/${application.survey.slug}`}>
+                    応募済み / 編集する
+                  </Link>
+                )}
               </div>
             </article>
           ))}

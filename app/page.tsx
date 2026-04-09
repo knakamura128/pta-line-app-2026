@@ -287,6 +287,9 @@ export default function Home() {
             <Link className="text-link" href="/me/applications">
               自分の回答一覧
             </Link>
+            <Link className="text-link" href="/closed">
+              締切済み一覧
+            </Link>
             <button className="ghost-button small" onClick={() => setIsGuideOpen(true)} type="button">
               使い方ガイド
             </button>
