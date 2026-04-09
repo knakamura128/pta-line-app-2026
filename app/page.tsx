@@ -295,6 +295,18 @@ export default function Home() {
       </header>
 
       {liffError ? <div className="alert-box error-text">{liffError}</div> : null}
+      <div className="alert-box">
+        <strong>確定通知を受け取るには、PTA公式LINEの友だち登録が必要です。</strong>
+        <p>
+          応募後の確定通知は公式LINEに届きます。まだ登録していない場合は、
+          {" "}
+          <Link className="auto-link" href="https://lin.ee/pbMkq2f" rel="noreferrer" target="_blank">
+            PTA公式LINEを友だち追加
+          </Link>
+          {" "}
+          してください。
+        </p>
+      </div>
 
       <main className="survey-grid">
         <section className="survey-column">
