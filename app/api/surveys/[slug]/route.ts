@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureSeedData } from "@/lib/bootstrap";
 import { prisma } from "@/lib/prisma";
+import { getSurveyStatusLabel, isSurveyClosed } from "@/lib/survey-status";
 
 export async function GET(
   request: Request,
@@ -87,7 +88,12 @@ export async function GET(
     closeAt: survey.closeAt,
     capacity: survey.capacity,
     currentApplications: survey._count.applications,
-    status: survey._count.applications >= survey.capacity ? "満員" : "募集中",
+    isClosed: isSurveyClosed(survey.closeAt),
+    status: getSurveyStatusLabel({
+      closeAt: survey.closeAt,
+      currentApplications: survey._count.applications,
+      capacity: survey.capacity
+    }),
     selectionTitle: survey.selectionTitle,
     selectionType: survey.selectionType,
     selectionOptions: survey.selectionOptions ?? [],

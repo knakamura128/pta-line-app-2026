@@ -5,6 +5,7 @@ import { ensureSeedData } from "@/lib/bootstrap";
 import { sendLinePushTextMessage } from "@/lib/line-messaging";
 import { prisma } from "@/lib/prisma";
 import { normalizeSelectionAnswers } from "@/lib/survey-selection";
+import { isSurveyClosed } from "@/lib/survey-status";
 
 type ApplyRequest = {
   surveyId?: string;
@@ -45,6 +46,10 @@ export async function POST(request: Request) {
 
   if (!survey) {
     return NextResponse.json({ message: "募集が見つかりません。" }, { status: 404 });
+  }
+
+  if (isSurveyClosed(survey.closeAt)) {
+    return NextResponse.json({ message: "この募集は締め切られました。" }, { status: 409 });
   }
 
   const surveySelectionOptions = Array.isArray(survey.selectionOptions)
@@ -193,6 +198,20 @@ export async function DELETE(request: Request) {
 
   if (!existing) {
     return NextResponse.json({ message: "応募データが見つかりません。" }, { status: 404 });
+  }
+
+  const survey = await prisma.survey.findUnique({
+    where: {
+      id: body.surveyId
+    }
+  });
+
+  if (!survey) {
+    return NextResponse.json({ message: "募集が見つかりません。" }, { status: 404 });
+  }
+
+  if (isSurveyClosed(survey.closeAt)) {
+    return NextResponse.json({ message: "締切後は応募の取り消しや編集はできません。" }, { status: 409 });
   }
 
   await prisma.application.delete({

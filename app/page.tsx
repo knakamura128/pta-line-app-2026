@@ -29,6 +29,7 @@ type Survey = {
   closeAt: string;
   capacity: number;
   currentApplications: number;
+  isClosed?: boolean;
   status: string;
   description: string;
   hasApplied?: boolean;
@@ -329,12 +330,17 @@ export default function Home() {
                 <span>
                   現在 {survey.currentApplications} / {survey.capacity} 名
                 </span>
-                <span className="tag active">{survey.status}</span>
+                <span className={`tag ${survey.isClosed ? "closed" : survey.status === "満員" ? "closed" : "active"}`}>{survey.status}</span>
               </div>
-              <button className="primary-button wide" onClick={() => handleApply(survey.slug)} type="button">
-                {myApplicationSlugs.includes(survey.slug) ? "応募済み / 編集する" : "応募する"}
+              <button
+                className="primary-button wide"
+                disabled={survey.isClosed}
+                onClick={() => handleApply(survey.slug)}
+                type="button"
+              >
+                {survey.isClosed ? "締切済み" : myApplicationSlugs.includes(survey.slug) ? "応募済み / 編集する" : "応募する"}
               </button>
-              {myApplicationSlugs.includes(survey.slug) ? (
+              {myApplicationSlugs.includes(survey.slug) && !survey.isClosed ? (
                 <button
                   className="danger-button wide secondary-action"
                   disabled={cancellingSurveySlug === survey.slug}
