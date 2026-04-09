@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -276,7 +277,10 @@ export default function Home() {
       <header className="landing-hero">
         <div className="hero-copy-wrap">
           <p className="eyebrow">PTA Volunteer Board</p>
-          <h1>活動募集一覧</h1>
+          <div className="title-with-logo">
+            <Image alt="池本PTAロゴ" className="hero-title-logo" height={96} priority src="/pta-logo.png" width={96} />
+            <h1>活動募集一覧</h1>
+          </div>
           <div className="hero-inline">
             <span className="status-pill">{isLineAuthed ? lineProfile?.displayName ?? "認証済み" : "未認証"}</span>
             <Link className="text-link" href="/me/applications">
