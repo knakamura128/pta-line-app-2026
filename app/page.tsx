@@ -320,7 +320,10 @@ export default function Home() {
         <section className="survey-column">
           {surveysLoading ? <div className="detail-block">募集を読み込み中です。</div> : null}
           {surveys.map((survey) => (
-            <article className="survey-card survey-open" key={survey.id}>
+            <article
+              className={`survey-card survey-open ${survey.status === "満員" && !myApplicationSlugs.includes(survey.slug) ? "survey-card-full" : ""}`}
+              key={survey.id}
+            >
               {(() => {
                 const hasApplied = myApplicationSlugs.includes(survey.slug);
                 const isFull = survey.status === "満員";
@@ -343,7 +346,7 @@ export default function Home() {
                 <span className={`tag ${survey.isClosed ? "closed" : survey.status === "満員" ? "closed" : "active"}`}>{survey.status}</span>
               </div>
               <button
-                className="primary-button wide"
+                className={`primary-button wide ${disableApply ? "is-disabled" : ""}`}
                 disabled={disableApply}
                 onClick={() => handleApply(survey.slug)}
                 type="button"

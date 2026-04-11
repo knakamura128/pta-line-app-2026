@@ -649,6 +649,19 @@ h1 {
   margin-bottom: 14px;
 }
 
+.survey-card-full {
+  background: rgba(255, 253, 249, 0.78);
+  border-color: rgba(29, 42, 51, 0.08);
+  box-shadow: none;
+}
+
+.survey-card-full h2,
+.survey-card-full p,
+.survey-card-full .survey-meta,
+.survey-card-full .capacity-row span {
+  opacity: 0.78;
+}
+
 .survey-meta,
 .capacity-row,
 .section-title-row {
@@ -692,6 +705,15 @@ h1 {
 .primary-button {
   color: white;
   background: var(--ink);
+}
+
+.primary-button.is-disabled,
+.danger-button:disabled,
+.primary-button:disabled {
+  background: #d1d8dd;
+  color: #72808a;
+  cursor: not-allowed;
+  border-color: transparent;
 }
 
 .action-mini.is-disabled {
