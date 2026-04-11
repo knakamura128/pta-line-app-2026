@@ -321,6 +321,13 @@ export default function Home() {
           {surveysLoading ? <div className="detail-block">募集を読み込み中です。</div> : null}
           {surveys.map((survey) => (
             <article className="survey-card survey-open" key={survey.id}>
+              {(() => {
+                const hasApplied = myApplicationSlugs.includes(survey.slug);
+                const isFull = survey.status === "満員";
+                const disableApply = survey.isClosed || (isFull && !hasApplied);
+
+                return (
+                  <>
               <div className="survey-meta">
                 <span>{survey.committee}</span>
                 <span>{`開催期間：${formatSurveyScheduleInTokyo(survey)}`}</span>
@@ -337,13 +344,13 @@ export default function Home() {
               </div>
               <button
                 className="primary-button wide"
-                disabled={survey.isClosed}
+                disabled={disableApply}
                 onClick={() => handleApply(survey.slug)}
                 type="button"
               >
-                {survey.isClosed ? "締切済み" : myApplicationSlugs.includes(survey.slug) ? "応募済み / 編集する" : "応募する"}
+                {survey.isClosed ? "締切済み" : isFull && !hasApplied ? "満員" : hasApplied ? "応募済み / 編集する" : "応募する"}
               </button>
-              {myApplicationSlugs.includes(survey.slug) && !survey.isClosed ? (
+              {hasApplied && !survey.isClosed ? (
                 <button
                   className="danger-button wide secondary-action"
                   disabled={cancellingSurveySlug === survey.slug}
@@ -353,6 +360,9 @@ export default function Home() {
                   {cancellingSurveySlug === survey.slug ? "取り消し中..." : "応募を取り消す"}
                 </button>
               ) : null}
+                  </>
+                );
+              })()}
             </article>
           ))}
         </section>

@@ -284,6 +284,9 @@ export default function SurveyDetailPage() {
     );
   }
 
+  const isFullForNewApplicant = Boolean(survey && survey.currentApplications >= survey.capacity && !survey.existingApplication);
+  const isFormLocked = Boolean(survey?.isClosed || isFullForNewApplicant);
+
   return (
     <div className="landing-shell">
       <header className="landing-hero">
@@ -363,7 +366,7 @@ export default function SurveyDetailPage() {
             <label className="field">
               <span>お子さんまたは保護者の姓</span>
               <input
-                disabled={survey?.isClosed}
+                disabled={isFormLocked}
                 onChange={(event) => setFamilyName(event.target.value)}
                 placeholder="例: 山田"
                 type="text"
@@ -377,7 +380,7 @@ export default function SurveyDetailPage() {
             <div className="double-fields">
               <label className="field">
                 <span>お子さんの学年</span>
-                <select disabled={survey?.isClosed} onChange={(event) => setChildGrade(event.target.value)} value={childGrade}>
+                <select disabled={isFormLocked} onChange={(event) => setChildGrade(event.target.value)} value={childGrade}>
                   <option value="">選択してください</option>
                   <option value="1">1年</option>
                   <option value="2">2年</option>
@@ -389,7 +392,7 @@ export default function SurveyDetailPage() {
               </label>
               <label className="field">
                 <span>お子さんの組</span>
-                <select disabled={survey?.isClosed} onChange={(event) => setChildClass(event.target.value)} value={childClass}>
+                <select disabled={isFormLocked} onChange={(event) => setChildClass(event.target.value)} value={childClass}>
                   <option value="">選択してください</option>
                   <option value="1組">1組</option>
                   <option value="2組">2組</option>
@@ -401,7 +404,7 @@ export default function SurveyDetailPage() {
             <label className="field">
               <span>連絡メモ</span>
               <textarea
-                disabled={survey?.isClosed}
+                disabled={isFormLocked}
                 onChange={(event) => setNote(event.target.value)}
                 placeholder="当日の連絡事項があれば入力してください"
                 rows={5}
@@ -421,7 +424,7 @@ export default function SurveyDetailPage() {
                     <label className="selection-item" key={option.label}>
                       <input
                         checked={isSelected}
-                        disabled={survey?.isClosed || (isFull && !isSelected)}
+                        disabled={isFormLocked || (isFull && !isSelected)}
                         name="selectionAnswer"
                         onChange={(event) => {
                           if (survey.selectionType === "RADIO") {
@@ -450,8 +453,22 @@ export default function SurveyDetailPage() {
                 <span>締切後は応募、編集、取り消しはできません。</span>
               </div>
             ) : null}
-            <button className="primary-button wide" disabled={submitting || cancelling || !survey || !lineProfile || survey?.isClosed} type="submit">
-              {survey?.isClosed ? "締切済み" : submitting ? "保存中..." : survey?.existingApplication ? "応募済み / 編集する" : "この内容で応募する"}
+            {isFullForNewApplicant ? (
+              <div className="inline-notice">
+                <strong>この募集は定員に達しています。</strong>
+                <span>現在は新規応募できません。応募済みの方のみ内容確認ができます。</span>
+              </div>
+            ) : null}
+            <button className="primary-button wide" disabled={submitting || cancelling || !survey || !lineProfile || isFormLocked} type="submit">
+              {survey?.isClosed
+                ? "締切済み"
+                : isFullForNewApplicant
+                  ? "満員"
+                  : submitting
+                    ? "保存中..."
+                    : survey?.existingApplication
+                      ? "応募済み / 編集する"
+                      : "この内容で応募する"}
             </button>
             {survey?.existingApplication && !survey.isClosed ? (
               <button
