@@ -834,6 +834,22 @@ h1 {
   font-weight: 600;
 }
 
+.consent-box {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.consent-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
 .selection-option-row {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(120px, 0.7fr) auto;

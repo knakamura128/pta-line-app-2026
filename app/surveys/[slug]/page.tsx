@@ -63,6 +63,7 @@ export default function SurveyDetailPage() {
   const [childClass, setChildClass] = useState("");
   const [selectionAnswers, setSelectionAnswers] = useState<string[]>([]);
   const [note, setNote] = useState("");
+  const [consentChecked, setConsentChecked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -142,6 +143,7 @@ export default function SurveyDetailPage() {
         setChildClass(nextSurvey.existingApplication?.childClass ?? "");
         setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
         setNote(nextSurvey.existingApplication?.note ?? "");
+        setConsentChecked(false);
       } catch (error) {
         if (!mounted) return;
         setErrorMessage(error instanceof Error ? error.message : "募集の取得に失敗しました。");
@@ -178,6 +180,7 @@ export default function SurveyDetailPage() {
     setChildClass(nextSurvey.existingApplication?.childClass ?? "");
     setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
     setNote(nextSurvey.existingApplication?.note ?? "");
+    setConsentChecked(false);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -195,6 +198,11 @@ export default function SurveyDetailPage() {
 
     if (survey.selectionType !== "NONE" && selectionAnswers.length === 0) {
       setErrorMessage("選択項目を入力してください。");
+      return;
+    }
+
+    if (!consentChecked) {
+      setErrorMessage("個人情報の取扱いへの承諾が必要です。");
       return;
     }
 
@@ -411,6 +419,25 @@ export default function SurveyDetailPage() {
                 value={note}
               />
             </label>
+            <div className="consent-box">
+              <p className="detail-title">個人情報について</p>
+              <p>
+                こちらにご入力いただいた情報は、PTA募集活動のみに使用します。
+                {" "}
+                <Link className="auto-link" href="https://drive.google.com/file/d/1H2kIInsXAykE42Vur67LuI1QX_nTAFVY/view" rel="noreferrer" target="_blank">
+                  詳しくはこちら
+                </Link>
+              </p>
+              <label className="consent-check">
+                <input
+                  checked={consentChecked}
+                  disabled={isFormLocked}
+                  onChange={(event) => setConsentChecked(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>承諾します。</span>
+              </label>
+            </div>
             {survey?.selectionType !== "NONE" && survey?.selectionTitle ? (
               <div className="field">
                 <span>{survey.selectionTitle}</span>
