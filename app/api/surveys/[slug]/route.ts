@@ -101,6 +101,7 @@ export async function GET(
       ? {
           id: existingApplication.id,
           familyName: existingApplication.familyName,
+          displayName: existingApplication.displayName,
           childGrade: existingApplication.childGrade,
           childClass: existingApplication.childClass,
           selectionAnswers: existingApplication.selectionAnswers ?? [],

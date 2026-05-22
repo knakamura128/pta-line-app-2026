@@ -868,6 +868,15 @@ select {
   color: var(--ink);
 }
 
+.native-select {
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+  cursor: pointer;
+  background-image: none;
+  touch-action: manipulation;
+}
+
 input[type="radio"],
 input[type="checkbox"] {
   width: auto;

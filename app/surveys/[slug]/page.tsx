@@ -47,6 +47,7 @@ type SurveyDetail = {
   existingApplication: {
     id: string;
     familyName: string;
+    displayName: string;
     childGrade: string;
     childClass: string;
     selectionAnswers: string[];
@@ -59,6 +60,7 @@ export default function SurveyDetailPage() {
   const router = useRouter();
   const [survey, setSurvey] = useState<SurveyDetail | null>(null);
   const [familyName, setFamilyName] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [childGrade, setChildGrade] = useState("");
   const [childClass, setChildClass] = useState("");
   const [selectionAnswers, setSelectionAnswers] = useState<string[]>([]);
@@ -139,6 +141,7 @@ export default function SurveyDetailPage() {
         const nextSurvey = data as SurveyDetail;
         setSurvey(nextSurvey);
         setFamilyName(nextSurvey.existingApplication?.familyName ?? "");
+        setDisplayName(nextSurvey.existingApplication?.displayName ?? profileName(lineProfile?.displayName));
         setChildGrade(nextSurvey.existingApplication?.childGrade ?? "");
         setChildClass(nextSurvey.existingApplication?.childClass ?? "");
         setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
@@ -176,6 +179,7 @@ export default function SurveyDetailPage() {
     const nextSurvey = data as SurveyDetail;
     setSurvey(nextSurvey);
     setFamilyName(nextSurvey.existingApplication?.familyName ?? "");
+    setDisplayName(nextSurvey.existingApplication?.displayName ?? profileName(lineProfile?.displayName));
     setChildGrade(nextSurvey.existingApplication?.childGrade ?? "");
     setChildClass(nextSurvey.existingApplication?.childClass ?? "");
     setSelectionAnswers(nextSurvey.existingApplication?.selectionAnswers ?? []);
@@ -191,8 +195,8 @@ export default function SurveyDetailPage() {
       return;
     }
 
-    if (!familyName || !childGrade || !childClass) {
-      setErrorMessage("姓、お子さんの学年、組を入力してください。");
+    if (!familyName || !displayName || !childGrade || !childClass) {
+      setErrorMessage("姓、お名前、お子さんの学年、組を入力してください。");
       return;
     }
 
@@ -220,7 +224,7 @@ export default function SurveyDetailPage() {
           surveyId: survey.id,
           lineUserId: lineProfile.userId,
           familyName,
-          displayName: lineProfile.displayName,
+          displayName,
           childGrade,
           childClass,
           selectionAnswers,
@@ -383,12 +387,18 @@ export default function SurveyDetailPage() {
             </label>
             <label className="field">
               <span>お名前</span>
-              <input readOnly type="text" value={lineProfile?.displayName ?? "LINE認証を確認中"} />
+              <input
+                disabled={isFormLocked}
+                onChange={(event) => setDisplayName(event.target.value)}
+                placeholder="例: 山田花子"
+                type="text"
+                value={displayName}
+              />
             </label>
             <div className="double-fields">
               <label className="field">
                 <span>お子さんの学年</span>
-                <select disabled={isFormLocked} onChange={(event) => setChildGrade(event.target.value)} value={childGrade}>
+                <select className="native-select" disabled={isFormLocked} onChange={(event) => setChildGrade(event.target.value)} value={childGrade}>
                   <option value="">選択してください</option>
                   <option value="1">1年</option>
                   <option value="2">2年</option>
@@ -400,7 +410,7 @@ export default function SurveyDetailPage() {
               </label>
               <label className="field">
                 <span>お子さんの組</span>
-                <select disabled={isFormLocked} onChange={(event) => setChildClass(event.target.value)} value={childClass}>
+                <select className="native-select" disabled={isFormLocked} onChange={(event) => setChildClass(event.target.value)} value={childClass}>
                   <option value="">選択してください</option>
                   <option value="1組">1組</option>
                   <option value="2組">2組</option>
@@ -512,6 +522,10 @@ export default function SurveyDetailPage() {
       </main>
     </div>
   );
+}
+
+function profileName(value?: string | null) {
+  return value ?? "";
 }
 
 function renderLiffStatus(status: LiffStatus) {
