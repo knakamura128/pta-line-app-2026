@@ -396,28 +396,42 @@ export default function SurveyDetailPage() {
               />
             </label>
             <div className="double-fields">
-              <label className="field">
+              <div className="field">
                 <span>お子さんの学年</span>
-                <select className="native-select" disabled={isFormLocked} onChange={(event) => setChildGrade(event.target.value)} value={childGrade}>
-                  <option value="">選択してください</option>
-                  <option value="1">1年</option>
-                  <option value="2">2年</option>
-                  <option value="3">3年</option>
-                  <option value="4">4年</option>
-                  <option value="5">5年</option>
-                  <option value="6">6年</option>
-                </select>
-              </label>
-              <label className="field">
+                <div className="choice-button-grid grade-choice-grid" role="radiogroup" aria-label="お子さんの学年">
+                  {["1", "2", "3", "4", "5", "6"].map((grade) => (
+                    <label className={`choice-button ${childGrade === grade ? "is-selected" : ""}`} key={grade}>
+                      <input
+                        checked={childGrade === grade}
+                        disabled={isFormLocked}
+                        name="childGrade"
+                        onChange={() => setChildGrade(grade)}
+                        type="radio"
+                        value={grade}
+                      />
+                      <span>{grade}年</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="field">
                 <span>お子さんの組</span>
-                <select className="native-select" disabled={isFormLocked} onChange={(event) => setChildClass(event.target.value)} value={childClass}>
-                  <option value="">選択してください</option>
-                  <option value="1組">1組</option>
-                  <option value="2組">2組</option>
-                  <option value="3組">3組</option>
-                  <option value="4組">4組</option>
-                </select>
-              </label>
+                <div className="choice-button-grid" role="radiogroup" aria-label="お子さんの組">
+                  {["1組", "2組", "3組", "4組"].map((className) => (
+                    <label className={`choice-button ${childClass === className ? "is-selected" : ""}`} key={className}>
+                      <input
+                        checked={childClass === className}
+                        disabled={isFormLocked}
+                        name="childClass"
+                        onChange={() => setChildClass(className)}
+                        type="radio"
+                        value={className}
+                      />
+                      <span>{className}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
             <label className="field">
               <span>連絡メモ</span>

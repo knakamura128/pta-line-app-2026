@@ -834,6 +834,47 @@ h1 {
   font-weight: 600;
 }
 
+.choice-button-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.grade-choice-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.choice-button {
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.choice-button input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-button.is-selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+
+.choice-button:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .consent-box {
   display: grid;
   gap: 10px;
@@ -866,15 +907,6 @@ select {
   background: white;
   padding: 14px 16px;
   color: var(--ink);
-}
-
-.native-select {
-  appearance: auto;
-  -webkit-appearance: menulist;
-  -moz-appearance: menulist;
-  cursor: pointer;
-  background-image: none;
-  touch-action: manipulation;
 }
 
 input[type="radio"],
