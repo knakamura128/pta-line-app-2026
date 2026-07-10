@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       status: "PUBLISHED"
     },
     orderBy: {
-      startsAt: "asc"
+      createdAt: "desc"
     },
     include: {
       _count: {
@@ -28,30 +28,30 @@ export async function GET(request: Request) {
     surveys
       .filter((survey) => (scope === "closed" ? isSurveyClosed(survey.closeAt) : !isSurveyClosed(survey.closeAt)))
       .map((survey) => ({
-      id: survey.id,
-      slug: survey.slug,
-      title: survey.title,
-      committee: survey.committee,
-      description: survey.description,
-      selectionTitle: survey.selectionTitle,
-      selectionType: survey.selectionType,
-      selectionOptions: survey.selectionOptions,
-      useDateRange: survey.useDateRange,
-      eventStartDate: survey.eventStartDate,
-      eventEndDate: survey.eventEndDate,
-      eventStartTime: survey.eventStartTime,
-      eventEndTime: survey.eventEndTime,
-      startsAt: survey.startsAt,
-      endsAt: survey.endsAt,
-      closeAt: survey.closeAt,
-      capacity: survey.capacity,
-      currentApplications: survey._count.applications,
-      isClosed: isSurveyClosed(survey.closeAt),
-      status: getSurveyStatusLabel({
+        id: survey.id,
+        slug: survey.slug,
+        title: survey.title,
+        committee: survey.committee,
+        description: survey.description,
+        selectionTitle: survey.selectionTitle,
+        selectionType: survey.selectionType,
+        selectionOptions: survey.selectionOptions,
+        useDateRange: survey.useDateRange,
+        eventStartDate: survey.eventStartDate,
+        eventEndDate: survey.eventEndDate,
+        eventStartTime: survey.eventStartTime,
+        eventEndTime: survey.eventEndTime,
+        startsAt: survey.startsAt,
+        endsAt: survey.endsAt,
         closeAt: survey.closeAt,
+        capacity: survey.capacity,
         currentApplications: survey._count.applications,
-        capacity: survey.capacity
-      })
+        isClosed: isSurveyClosed(survey.closeAt),
+        status: getSurveyStatusLabel({
+          closeAt: survey.closeAt,
+          currentApplications: survey._count.applications,
+          capacity: survey.capacity
+        })
       }))
   );
 }
