@@ -57,11 +57,17 @@ export default async function AdminSurveyDetailPage({
     orderBy: [{ childGrade: "asc" }, { childClass: "asc" }]
   });
 
-  const confirmationLogCount = await prisma.messageDelivery.count({
+  const confirmationDeliveries = await prisma.messageDelivery.findMany({
     where: {
       surveyId: survey.id,
       kind: "CONFIRMATION",
-      status: "SENT"
+      applicationId: {
+        not: null
+      }
+    },
+    select: {
+      applicationId: true,
+      status: true
     }
   });
 
@@ -82,6 +88,25 @@ export default async function AdminSurveyDetailPage({
       }
     }
   });
+
+  const successfulConfirmationApplicationIds = new Set(
+    confirmationDeliveries
+      .filter((delivery) => delivery.status === "SENT" && delivery.applicationId)
+      .map((delivery) => delivery.applicationId as string)
+  );
+  const failedConfirmationApplicationIds = new Set(
+    confirmationDeliveries
+      .filter((delivery) => delivery.status === "FAILED" && delivery.applicationId)
+      .map((delivery) => delivery.applicationId as string)
+  );
+  const confirmationTargets = survey.applications.slice(0, survey.capacity);
+  const confirmationSentCount = confirmationTargets.filter((application) =>
+    successfulConfirmationApplicationIds.has(application.id)
+  ).length;
+  const confirmationFailedCount = confirmationTargets.filter(
+    (application) => !successfulConfirmationApplicationIds.has(application.id) && failedConfirmationApplicationIds.has(application.id)
+  ).length;
+  const confirmationPendingCount = confirmationTargets.length - confirmationSentCount;
 
   return (
     <main className="survey-grid">
@@ -179,8 +204,14 @@ export default async function AdminSurveyDetailPage({
                 <span>{formatDateTimeInTokyo(application.createdAt)}</span>
               </div>
               <div className="mobile-table-cell" data-label="状態">
-                <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
-                  {index < survey.capacity ? "確定候補" : "確定前"}
+                <span>
+                  <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
+                    {index < survey.capacity ? "確定候補" : "確定前"}
+                  </span>
+                  <br />
+                  <small className={`notification-status ${getConfirmationStatusClass(application.id, index < survey.capacity, successfulConfirmationApplicationIds, failedConfirmationApplicationIds)}`}>
+                    {getConfirmationStatusLabel(application.id, index < survey.capacity, successfulConfirmationApplicationIds, failedConfirmationApplicationIds)}
+                  </small>
                 </span>
               </div>
               <div className="mobile-table-cell" data-label="回答内容">
@@ -254,7 +285,12 @@ export default async function AdminSurveyDetailPage({
           </div>
           <div className="detail-block">
             <p className="detail-title">確定通知</p>
-            <p>送信成功ログ: {confirmationLogCount} 件</p>
+            <p>
+              送信済み: {confirmationSentCount} / {confirmationTargets.length} 件
+              <br />
+              未成功: {confirmationPendingCount} 人
+              {confirmationFailedCount > 0 ? `（失敗 ${confirmationFailedCount} 人）` : ""}
+            </p>
           </div>
           <form action="/api/admin/surveys/confirm" method="post">
             <input name="surveyId" type="hidden" value={survey.id} />
@@ -266,4 +302,46 @@ export default async function AdminSurveyDetailPage({
       </aside>
     </main>
   );
+}
+
+function getConfirmationStatusLabel(
+  applicationId: string,
+  isConfirmationTarget: boolean,
+  successfulConfirmationApplicationIds: Set<string>,
+  failedConfirmationApplicationIds: Set<string>
+) {
+  if (!isConfirmationTarget) {
+    return "確定通知: 対象外";
+  }
+
+  if (successfulConfirmationApplicationIds.has(applicationId)) {
+    return "確定通知: 送信済み";
+  }
+
+  if (failedConfirmationApplicationIds.has(applicationId)) {
+    return "確定通知: 失敗あり";
+  }
+
+  return "確定通知: 未送信";
+}
+
+function getConfirmationStatusClass(
+  applicationId: string,
+  isConfirmationTarget: boolean,
+  successfulConfirmationApplicationIds: Set<string>,
+  failedConfirmationApplicationIds: Set<string>
+) {
+  if (!isConfirmationTarget) {
+    return "muted";
+  }
+
+  if (successfulConfirmationApplicationIds.has(applicationId)) {
+    return "sent";
+  }
+
+  if (failedConfirmationApplicationIds.has(applicationId)) {
+    return "failed";
+  }
+
+  return "pending";
 }
