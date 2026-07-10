@@ -16,7 +16,7 @@ export default async function AdminSurveysPage({
 
   const surveys = await prisma.survey.findMany({
     orderBy: {
-      startsAt: "asc"
+      createdAt: "desc"
     },
     include: {
       _count: {
