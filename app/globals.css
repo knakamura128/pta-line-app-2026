@@ -728,6 +728,25 @@ h1 {
   border: 1px solid var(--line);
 }
 
+.confirmation-send-button {
+  margin-top: 10px;
+  min-height: 44px;
+  background: #155e75;
+  color: #fff;
+  border: 1px solid #155e75;
+  cursor: pointer;
+}
+
+.confirmation-send-button:hover:not(:disabled) {
+  background: #164e63;
+  border-color: #164e63;
+}
+
+.confirmation-send-button:focus-visible {
+  outline: 3px solid #0284c7;
+  outline-offset: 3px;
+}
+
 .danger-button {
   background: #fff1f2;
   color: #be123c;

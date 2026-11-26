@@ -31,7 +31,7 @@ export function IndividualConfirmationButton({
     >
       <input name="surveyId" type="hidden" value={surveyId} />
       <input name="applicationId" type="hidden" value={applicationId} />
-      <button className="ghost-button small" disabled={pending} type="submit">
+      <button className="primary-button small confirmation-send-button" disabled={pending} type="submit">
         {pending ? "送信中…" : sent ? "確定通知を再送する" : "確定通知を個別送信"}
       </button>
     </form>
