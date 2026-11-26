@@ -132,16 +132,16 @@ export default async function AdminApplicationsPage() {
 
             return (
               <div className="table-row applications-summary-table" key={survey.id}>
-                <div className="mobile-table-cell" data-label="募集名">
+                <div className="mobile-table-cell summary-survey-title" data-label="募集名">
                   <span>{survey.title}</span>
                 </div>
-                <div className="mobile-table-cell" data-label="応募数">
+                <div className="mobile-table-cell summary-survey-count" data-label="応募数">
                   <span>{survey._count.applications}</span>
                 </div>
-                <div className="mobile-table-cell" data-label="定員">
+                <div className="mobile-table-cell summary-survey-count" data-label="定員">
                   <span>{survey.capacity}</span>
                 </div>
-                <div className="mobile-table-cell" data-label="確定通知">
+                <div className="mobile-table-cell summary-survey-notification" data-label="確定通知">
                   <span>
                     {summary?.sentCount ?? 0} / {summary?.targetCount ?? 0} 送信済み
                     <br />
@@ -151,8 +151,8 @@ export default async function AdminApplicationsPage() {
                     </small>
                   </span>
                 </div>
-                <div className="mobile-table-cell" data-label="詳細">
-                  <Link className="text-link" href={`/admin/surveys/view?id=${survey.id}`}>
+                <div className="mobile-table-cell summary-survey-action" data-label="詳細">
+                  <Link className="primary-button small summary-detail-button" href={`/admin/surveys/view?id=${survey.id}`}>
                     集計を見る
                   </Link>
                 </div>

@@ -1162,6 +1162,26 @@ input[type="checkbox"] {
   grid-template-columns: 1.7fr 0.65fr 0.65fr 1.1fr 0.8fr;
 }
 
+.summary-detail-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  background: #155e75;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+}
+
+.summary-detail-button:hover {
+  background: #164e63;
+}
+
+.summary-detail-button:focus-visible {
+  outline: 3px solid #0284c7;
+  outline-offset: 3px;
+}
+
 .admin-survey-table {
   grid-template-columns: 1.7fr 0.9fr 0.8fr 1fr 1.4fr;
 }
@@ -1379,6 +1399,62 @@ input[type="checkbox"] {
   .mobile-table-cell .tag {
     width: fit-content;
     min-width: 108px;
+  }
+
+  .table-row.applications-summary-table {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px solid #b9cecb;
+    border-top: 4px solid #28746e;
+    border-radius: 16px;
+    background: #fff;
+  }
+
+  .applications-summary-table .mobile-table-cell {
+    min-width: 0;
+  }
+
+  .applications-summary-table .summary-survey-title,
+  .applications-summary-table .summary-survey-notification,
+  .applications-summary-table .summary-survey-action {
+    grid-column: 1 / -1;
+    justify-items: stretch;
+  }
+
+  .applications-summary-table .summary-survey-title {
+    color: var(--ink);
+    font-weight: 800;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .summary-survey-title::before,
+  .summary-survey-action::before {
+    display: none;
+  }
+
+  .applications-summary-table .summary-survey-count {
+    padding: 12px;
+    border-radius: 10px;
+    background: #edf4f2;
+  }
+
+  .summary-survey-count > span {
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .applications-summary-table .summary-survey-notification {
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    line-height: 1.7;
+  }
+
+  .summary-survey-action .summary-detail-button {
+    width: 100%;
   }
 
   .selection-option-row {
