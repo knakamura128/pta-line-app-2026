@@ -88,7 +88,9 @@ export default async function AdminApplicationsPage() {
       applicationRanks.set(application.id, index);
     });
 
-    const notificationTargets = survey.applications.slice(0, survey.capacity);
+    const notificationTargets = survey.applications.filter(
+      (application, index) => index < survey.capacity || successfulConfirmationApplicationIds.has(application.id) || failedConfirmationApplicationIds.has(application.id)
+    );
     const sentCount = notificationTargets.filter((application) => successfulConfirmationApplicationIds.has(application.id)).length;
     const failedCount = notificationTargets.filter(
       (application) => !successfulConfirmationApplicationIds.has(application.id) && failedConfirmationApplicationIds.has(application.id)
@@ -264,7 +266,7 @@ function getConfirmationStatus(
   successfulConfirmationApplicationIds: Set<string>,
   failedConfirmationApplicationIds: Set<string>
 ) {
-  if (!isConfirmationTarget) {
+  if (!isConfirmationTarget && !successfulConfirmationApplicationIds.has(applicationId) && !failedConfirmationApplicationIds.has(applicationId)) {
     return {
       className: "muted",
       label: "確定通知: 対象外"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IndividualConfirmationButton } from "@/app/admin/surveys/individual-confirmation-button";
 import { notFound } from "next/navigation";
 import { LinkifiedText } from "@/app/components/linkified-text";
 import { ensureSeedData } from "@/lib/bootstrap";
@@ -99,7 +100,9 @@ export default async function AdminSurveyDetailPage({
       .filter((delivery) => delivery.status === "FAILED" && delivery.applicationId)
       .map((delivery) => delivery.applicationId as string)
   );
-  const confirmationTargets = survey.applications.slice(0, survey.capacity);
+  const confirmationTargets = survey.applications.filter(
+    (application, index) => index < survey.capacity || successfulConfirmationApplicationIds.has(application.id) || failedConfirmationApplicationIds.has(application.id)
+  );
   const confirmationSentCount = confirmationTargets.filter((application) =>
     successfulConfirmationApplicationIds.has(application.id)
   ).length;
@@ -181,7 +184,7 @@ export default async function AdminSurveyDetailPage({
         <div className="table-card">
           <div className="section-title-row">
             <h4>回答者一覧</h4>
-            <span>先着 {survey.capacity} 名が通知対象</span>
+            <span>一括送信は先着 {survey.capacity} 名 / 個別送信も可能</span>
           </div>
           <div className="table-head answers">
             <span>回答者</span>
@@ -204,7 +207,7 @@ export default async function AdminSurveyDetailPage({
                 <span>{formatDateTimeInTokyo(application.createdAt)}</span>
               </div>
               <div className="mobile-table-cell" data-label="状態">
-                <span>
+                <div>
                   <span className={`tag ${index < survey.capacity ? "confirmed" : "pending"}`}>
                     {index < survey.capacity ? "確定候補" : "確定前"}
                   </span>
@@ -212,7 +215,13 @@ export default async function AdminSurveyDetailPage({
                   <small className={`notification-status ${getConfirmationStatusClass(application.id, index < survey.capacity, successfulConfirmationApplicationIds, failedConfirmationApplicationIds)}`}>
                     {getConfirmationStatusLabel(application.id, index < survey.capacity, successfulConfirmationApplicationIds, failedConfirmationApplicationIds)}
                   </small>
-                </span>
+                  <IndividualConfirmationButton
+                    applicationId={application.id}
+                    recipientName={application.familyName || application.displayName}
+                    sent={successfulConfirmationApplicationIds.has(application.id)}
+                    surveyId={survey.id}
+                  />
+                </div>
               </div>
               <div className="mobile-table-cell" data-label="回答内容">
                 <span>
@@ -310,7 +319,7 @@ function getConfirmationStatusLabel(
   successfulConfirmationApplicationIds: Set<string>,
   failedConfirmationApplicationIds: Set<string>
 ) {
-  if (!isConfirmationTarget) {
+  if (!isConfirmationTarget && !successfulConfirmationApplicationIds.has(applicationId) && !failedConfirmationApplicationIds.has(applicationId)) {
     return "確定通知: 対象外";
   }
 
@@ -331,7 +340,7 @@ function getConfirmationStatusClass(
   successfulConfirmationApplicationIds: Set<string>,
   failedConfirmationApplicationIds: Set<string>
 ) {
-  if (!isConfirmationTarget) {
+  if (!isConfirmationTarget && !successfulConfirmationApplicationIds.has(applicationId) && !failedConfirmationApplicationIds.has(applicationId)) {
     return "muted";
   }
 

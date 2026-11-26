@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: Request) {
   const formData = await request.formData();
   const surveyId = readString(formData, "surveyId");
+  const applicationId = readString(formData, "applicationId");
+  const isIndividual = formData.has("applicationId");
 
   if (!surveyId) {
     return NextResponse.redirect(new URL("/admin/surveys?error=missing-survey-id", request.url), { status: 303 });
@@ -25,7 +27,17 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/admin/surveys?error=survey-not-found", request.url), { status: 303 });
   }
 
-  const recipients = survey.applications.slice(0, survey.capacity);
+  const recipients = isIndividual
+    ? survey.applications.filter((application) => application.id === applicationId)
+    : survey.applications.slice(0, survey.capacity);
+
+  if (isIndividual && recipients.length !== 1) {
+    return NextResponse.json({ message: "この募集の応募者が見つかりません。" }, { status: 404 });
+  }
+
+  if (!survey.confirmationMessage.trim()) {
+    return NextResponse.json({ message: "確定通知本文を設定してください。" }, { status: 400 });
+  }
   let sentCount = 0;
   let failedCount = 0;
 
